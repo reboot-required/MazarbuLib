@@ -1,2 +1,2 @@
-.github  export-ignore
-examples export-ignore
+.github/  export-ignore
+examples/ export-ignore
