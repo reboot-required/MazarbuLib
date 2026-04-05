@@ -17,7 +17,7 @@
 // layouts and value formatting without target hardware.
 //
 // Build (from repo root):
-//   gcc -std=c99 -Wall -Wextra -Wpedantic
+//   gcc -std=c99 -Wall -Wextra -Wpedantic \
 //       -Iinclude examples/posix.c src/mazarbulib.c -o mazarbulib_demo
 //   or: make posix-example
 //
