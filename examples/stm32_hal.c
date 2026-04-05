@@ -32,7 +32,7 @@ static int32_t rpm = 1200;
 void uart_send(const char *data, size_t len) {
   /* HAL_UART_Transmit takes uint8_t * but does not write to the buffer.
    * The const-discard cast is intentional and safe given the HAL ABI. */
-  HAL_UART_Transmit(&huart1, (uint8_t *)(uintptr_t)data, (uint16_t)len,
+  HAL_UART_Transmit(&huart1, (uint8_t *)(void *)data, (uint16_t)len,
                     HAL_MAX_DELAY);
 }
 
