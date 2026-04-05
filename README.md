@@ -94,6 +94,21 @@ void uart_rx_callback(char c) {
 [n]ext  [p]rev  (1/2)
 ```
 
+## Platform Integration
+
+`uart_send` and `terminal_clear` are the only platform-specific code you need
+to write. Ready-to-use starting points are in [`examples/`](examples/):
+
+| Target               | File                                              |
+|----------------------|---------------------------------------------------|
+| STM32 (HAL)          | [`examples/stm32_hal.c`](examples/stm32_hal.c)   |
+| Arduino              | [`examples/arduino.cpp`](examples/arduino.cpp)   |
+| POSIX / host testing | [`examples/posix.c`](examples/posix.c)           |
+
+Pass `NULL` for `terminal_clear` on targets without ANSI terminal support;
+the library will render without clearing first, causing the output to scroll
+instead of refreshing in place.
+
 ## Configuration
 
 All limits are set at compile time via `#define`. Override them in your build
