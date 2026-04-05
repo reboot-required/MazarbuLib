@@ -28,9 +28,11 @@ typedef char mazarbulib_assert_rows_fit_uint8_
 
 // Maximum number of characters from the screen name that fit on the title
 // line ("=== <name> ===\r\n") within MAZARBULIB_LINE_BUF_SIZE_.
-// The fixed overhead of "===  ===\r\n\0" is 11 bytes.
+// The fixed overhead of "===  ===\r\n\0" is 11 bytes; subtract one more byte
+// to preserve the current visible-name limit while deriving it from the line
+// buffer size directly.
 #define MAZARBULIB_TITLE_MAX_LEN_                                              \
-  (MAZARBULIB_LABEL_WIDTH + MAZARBULIB_VALUE_WIDTH + 4)
+  (MAZARBULIB_LINE_BUF_SIZE_ - 12)
 
 // Dash count for each table border segment (column width + two spaces).
 #define MAZARBULIB_LABEL_SEG_LEN_ (MAZARBULIB_LABEL_WIDTH + 2)
