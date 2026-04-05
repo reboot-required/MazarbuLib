@@ -8,12 +8,18 @@
 
 // POSIX / host-testing example.
 //
+// NOTE: This file is a reference illustration of how MazarbuLib could be
+// integrated on this platform. It is not production-ready code — adapt it
+// to your project's actual peripheral configuration, error handling strategy,
+// and coding standards before use.
+//
 // Renders a live-updating table to stdout. Useful for iterating on screen
 // layouts and value formatting without target hardware.
 //
 // Build (from repo root):
-//   gcc -std=c99 -Wall -Wextra -Wpedantic \
+//   gcc -std=c99 -Wall -Wextra -Wpedantic
 //       -Iinclude examples/posix.c src/mazarbulib.c -o mazarbulib_demo
+//   or: make posix-example
 //
 // Run: ./mazarbulib_demo
 //
@@ -39,12 +45,23 @@ void terminal_clear(void) {
 }
 
 int main(void) {
-  mazarbulib_init(&g_lib, uart_send, terminal_clear);
+  if (mazarbulib_init(&g_lib, uart_send, terminal_clear) != MAZARBULIB_ERR_OK) {
+    fprintf(stderr, "mazarbulib_init failed\n");
+    return 1;
+  }
 
   int s0 = mazarbulib_register_screen(&g_lib, "Engine Monitor");
-  mazarbulib_register_row(&g_lib, s0, "Temperature", MAZARBULIB_TYPE_FLOAT,
-                          &temperature);
-  mazarbulib_register_row(&g_lib, s0, "RPM", MAZARBULIB_TYPE_INT32, &rpm);
+  if (s0 < 0) {
+    fprintf(stderr, "mazarbulib_register_screen failed: %d\n", s0);
+    return 1;
+  }
+  if (mazarbulib_register_row(&g_lib, s0, "Temperature", MAZARBULIB_TYPE_FLOAT,
+                              &temperature) != MAZARBULIB_ERR_OK ||
+      mazarbulib_register_row(&g_lib, s0, "RPM", MAZARBULIB_TYPE_INT32, &rpm) !=
+          MAZARBULIB_ERR_OK) {
+    fprintf(stderr, "mazarbulib_register_row failed\n");
+    return 1;
+  }
 
   for (;;) {
     mazarbulib_tick(&g_lib);

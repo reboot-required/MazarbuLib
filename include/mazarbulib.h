@@ -29,7 +29,7 @@ typedef enum {
   MAZARBULIB_TYPE_UINT32, // uint32_t, displayed as unsigned decimal.
   MAZARBULIB_TYPE_FLOAT,  // float, displayed with two decimal places.
   MAZARBULIB_TYPE_DOUBLE, // double, displayed with two decimal places.
-  MAZARBULIB_TYPE_STRING, // const char *, displayed as-is.
+  MAZARBULIB_TYPE_STRING, // const char **, dereferenced at render time.
   MAZARBULIB_TYPE_BOOL,   // bool, displayed as "true" / "false".
   MAZARBULIB_TYPE_HEX,    // uint32_t, displayed as 0xXXXXXXXX.
 } mazarbulib_type_t;
@@ -37,7 +37,6 @@ typedef enum {
 // Return codes used throughout the API.
 typedef enum {
   MAZARBULIB_ERR_OK = 0,
-  MAZARBULIB_OK = MAZARBULIB_ERR_OK, // Backwards-compatible alias.
   MAZARBULIB_ERR_FULL = -1,    // Screen table or row table is full.
   MAZARBULIB_ERR_INVALID = -2, // NULL pointer or out-of-range argument.
 } mazarbulib_err_t;
@@ -58,6 +57,10 @@ typedef struct {
 
 // Library context. Declare one instance statically in the application.
 // Do not modify the fields directly after initialisation.
+//
+// Note: screen_count and active_screen are stored in uint8_t. If
+// MAZARBULIB_MAX_SCREENS or MAZARBULIB_MAX_ROWS_PER_SCREEN is raised above
+// 255 a compile-time error is produced in mazarbulib.c.
 typedef struct {
   mazarbulib_screen_t screens[MAZARBULIB_MAX_SCREENS]; // Screen table.
   uint8_t screen_count;  // Number of registered screens.
@@ -100,10 +103,16 @@ int mazarbulib_register_screen(mazarbulib_t *ctx, const char *name);
 // value_ptr is dereferenced at render time, so the pointed-to value is
 // always live.
 //
-// Note: label must be at most MAZARBULIB_LABEL_WIDTH characters; longer
-// labels will extend beyond the column border without truncation.
+// For every type, pass the address of your variable:
+//   int32_t rpm = 0;  register_row(..., MAZARBULIB_TYPE_INT32,  &rpm);
+//   const char *msg;  register_row(..., MAZARBULIB_TYPE_STRING, &msg);
 //
-// Returns MAZARBULIB_ERR_FULL, MAZARBULIB_ERR_INVALID, or MAZARBULIB_OK.
+// MAZARBULIB_TYPE_STRING: value_ptr must be a const char ** (pointer to the
+// string pointer). A NULL inner pointer is rendered as an empty string.
+// Label and value strings longer than MAZARBULIB_LABEL_WIDTH /
+// MAZARBULIB_VALUE_WIDTH are truncated to keep table borders aligned.
+//
+// Returns MAZARBULIB_ERR_FULL, MAZARBULIB_ERR_INVALID, or MAZARBULIB_ERR_OK.
 mazarbulib_err_t mazarbulib_register_row(mazarbulib_t *ctx, int screen_idx,
                                          const char *label,
                                          mazarbulib_type_t type,
@@ -128,7 +137,7 @@ void mazarbulib_feed_char(mazarbulib_t *ctx, char c);
 void mazarbulib_tick(mazarbulib_t *ctx);
 
 #ifdef __cplusplus
-}  // extern "C"
+} // extern "C"
 #endif
 
-#endif  // MAZARBULIB_INCLUDE_MAZARBULIB_H_
+#endif // MAZARBULIB_INCLUDE_MAZARBULIB_H_

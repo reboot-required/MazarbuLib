@@ -12,10 +12,25 @@
 #include <stdio.h>
 #include <string.h>
 
+// Compile-time guard: screen_count and row_count are stored in uint8_t.
+// If the configured limits exceed 255 this typedef produces a compile error.
+typedef char
+    mazarbulib_assert_screens_fit_uint8_[(MAZARBULIB_MAX_SCREENS <= 255u) ? 1
+                                                                          : -1];
+typedef char mazarbulib_assert_rows_fit_uint8_
+    [(MAZARBULIB_MAX_ROWS_PER_SCREEN <= 255u) ? 1 : -1];
+
 // Internal line buffer large enough for any formatted table line.
-// Row layout: "| " + label + " | " + value + " |\r\n\0"
+// Row layout: "| " + label(LABEL_WIDTH) + " | " + value(VALUE_WIDTH) + "
+// |\r\n\0"
 #define MAZARBULIB_LINE_BUF_SIZE_                                              \
   (MAZARBULIB_LABEL_WIDTH + MAZARBULIB_VALUE_WIDTH + 16)
+
+// Maximum number of characters from the screen name that fit on the title
+// line ("=== <name> ===\r\n") within MAZARBULIB_LINE_BUF_SIZE_.
+// The fixed overhead of "===  ===\r\n\0" is 11 bytes.
+#define MAZARBULIB_TITLE_MAX_LEN_                                              \
+  (MAZARBULIB_LABEL_WIDTH + MAZARBULIB_VALUE_WIDTH + 4)
 
 // Dash count for each table border segment (column width + two spaces).
 #define MAZARBULIB_LABEL_SEG_LEN_ (MAZARBULIB_LABEL_WIDTH + 2)
@@ -77,9 +92,14 @@ static void mazarbulib_format_value_(const mazarbulib_row_t *row, char *buf,
   case MAZARBULIB_TYPE_DOUBLE:
     snprintf(buf, buf_len, "%.2f", *(const double *)row->value_ptr);
     break;
-  case MAZARBULIB_TYPE_STRING:
-    snprintf(buf, buf_len, "%s", (const char *)row->value_ptr);
+  case MAZARBULIB_TYPE_STRING: {
+    // value_ptr is a const char ** — dereference to get the current string
+    // pointer, consistent with all other types. A NULL inner pointer renders
+    // as an empty string.
+    const char *s = *(const char **)row->value_ptr;
+    snprintf(buf, buf_len, "%s", (s != NULL) ? s : "");
     break;
+  }
   case MAZARBULIB_TYPE_BOOL:
     snprintf(buf, buf_len, "%s",
              *(const bool *)row->value_ptr ? "true" : "false");
@@ -99,8 +119,9 @@ static void mazarbulib_render_screen_(mazarbulib_t *ctx) {
   const mazarbulib_screen_t *s = &ctx->screens[ctx->active_screen];
   int n;
 
-  // Title.
-  n = snprintf(line, sizeof(line), "=== %s ===\r\n", s->name);
+  // Title — truncated to MAZARBULIB_TITLE_MAX_LEN_ to stay within line buffer.
+  n = snprintf(line, sizeof(line), "=== %.*s ===\r\n",
+               MAZARBULIB_TITLE_MAX_LEN_, s->name);
   mazarbulib_send_line_(ctx, line, n, sizeof(line));
 
   mazarbulib_send_separator_(ctx);
@@ -111,14 +132,16 @@ static void mazarbulib_render_screen_(mazarbulib_t *ctx) {
 
     mazarbulib_format_value_(row, val_buf, sizeof(val_buf));
 
+    // Use %-*.*s / %*.*s to both pad and clamp each column to its configured
+    // width, keeping the table borders aligned regardless of content length.
     if (mazarbulib_is_right_aligned_(row->type)) {
-      n = snprintf(line, sizeof(line), "| %-*s | %*s |\r\n",
-                   MAZARBULIB_LABEL_WIDTH, row->label, MAZARBULIB_VALUE_WIDTH,
-                   val_buf);
+      n = snprintf(line, sizeof(line), "| %-*.*s | %*.*s |\r\n",
+                   MAZARBULIB_LABEL_WIDTH, MAZARBULIB_LABEL_WIDTH, row->label,
+                   MAZARBULIB_VALUE_WIDTH, MAZARBULIB_VALUE_WIDTH, val_buf);
     } else {
-      n = snprintf(line, sizeof(line), "| %-*s | %-*s |\r\n",
-                   MAZARBULIB_LABEL_WIDTH, row->label, MAZARBULIB_VALUE_WIDTH,
-                   val_buf);
+      n = snprintf(line, sizeof(line), "| %-*.*s | %-*.*s |\r\n",
+                   MAZARBULIB_LABEL_WIDTH, MAZARBULIB_LABEL_WIDTH, row->label,
+                   MAZARBULIB_VALUE_WIDTH, MAZARBULIB_VALUE_WIDTH, val_buf);
     }
     mazarbulib_send_line_(ctx, line, n, sizeof(line));
   }
