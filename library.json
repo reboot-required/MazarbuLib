@@ -1,0 +1,22 @@
+{
+  "name": "mazarbulib",
+  "version": "0.1.0",
+  "description": "UART tabular screen display library for embedded systems",
+  "license": "MIT",
+  "homepage": "https://github.com/reboot-required/MazarbuLib",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/reboot-required/MazarbuLib"
+  },
+  "authors": [
+    {
+      "name": "Lukas Kraft",
+      "url": "https://github.com/reboot-required"
+    }
+  ],
+  "build": {
+    "srcDir": "src",
+    "includeDir": "include",
+    "flags": "-std=c99"
+  }
+}

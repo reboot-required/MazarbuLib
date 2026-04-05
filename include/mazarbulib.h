@@ -15,6 +15,10 @@
 
 #include "mazarbulib_config.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // -----------------------------------------------------------------------------
 // Types
 // -----------------------------------------------------------------------------
@@ -123,4 +127,8 @@ void mazarbulib_feed_char(mazarbulib_t *ctx, char c);
 // non-NULL) before rendering.
 void mazarbulib_tick(mazarbulib_t *ctx);
 
-#endif // MAZARBULIB_INCLUDE_MAZARBULIB_H_
+#ifdef __cplusplus
+}  // extern "C"
+#endif
+
+#endif  // MAZARBULIB_INCLUDE_MAZARBULIB_H_
