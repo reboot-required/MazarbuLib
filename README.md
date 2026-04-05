@@ -96,8 +96,9 @@ void uart_rx_callback(char c) {
 
 ## Platform Integration
 
-`uart_send` and `terminal_clear` are the only platform-specific code you need
-to write. Ready-to-use starting points are in [`examples/`](examples/):
+Your UART send function and `terminal_clear` are the only platform-specific
+code you need to write. Ready-to-use starting points are in
+[`examples/`](examples/):
 
 | Target               | File                                              |
 |----------------------|---------------------------------------------------|
