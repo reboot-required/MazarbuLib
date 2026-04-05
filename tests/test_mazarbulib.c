@@ -346,9 +346,9 @@ int main(int argc, char **argv) {
   }
 
   if (g_tests_failed > 0) {
-    fprintf(stderr, "%d/%d tests FAILED\n", g_tests_failed, g_tests_run);
+    fprintf(stderr, "%d/%d assertions FAILED\n", g_tests_failed, g_tests_run);
     return 1;
   }
-  printf("%d/%d tests passed\n", g_tests_run, g_tests_run);
+  printf("%d/%d assertions passed\n", g_tests_run, g_tests_run);
   return 0;
 }
