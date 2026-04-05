@@ -56,3 +56,7 @@ dkms.conf
 
 # CMake build directory
 build/
+
+# Makefile-built binaries (make test, make posix-example)
+mazarbulib_test
+mazarbulib_posix_demo

@@ -1,0 +1,30 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "test (make)",
+      "type": "shell",
+      "command": "make test",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "test (cmake + ctest)",
+      "type": "shell",
+      "command": "cmake -B build -DMAZARBULIB_BUILD_TESTS=ON && cmake --build build && ctest --test-dir build --output-on-failure",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

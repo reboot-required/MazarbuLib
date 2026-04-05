@@ -1,5 +1,7 @@
 # MazarbuLib
 
+[![CI](https://github.com/reboot-required/MazarbuLib/actions/workflows/ci.yml/badge.svg)](https://github.com/reboot-required/MazarbuLib/actions/workflows/ci.yml)
+
 A portable, static-allocation C library for displaying tabular screens of data
 over UART. Designed to be embedded in projects as a git submodule — no dynamic
 allocation, no OS dependencies, one translation unit.
@@ -94,6 +96,46 @@ void uart_rx_callback(char c) {
 [n]ext  [p]rev  (1/2)
 ```
 
+## Building
+
+### CMake (recommended)
+
+```bash
+cmake -B build
+cmake --build build
+```
+
+Optional flags:
+
+| Flag | Default | Effect |
+|------|---------|--------|
+| `-DMAZARBULIB_BUILD_TESTS=ON` | `OFF` | Build and register the test binary |
+| `-DMAZARBULIB_BUILD_EXAMPLES=ON` | `OFF` | Build the POSIX demo executable |
+
+Run tests after configuring with `-DMAZARBULIB_BUILD_TESTS=ON`:
+
+```bash
+ctest --test-dir build --output-on-failure
+```
+
+### Plain Makefile
+
+```bash
+make                 # builds libmazarbulib.a
+make posix-example   # builds mazarbulib_posix_demo
+make test            # builds and runs the test suite
+make clean
+```
+
+### Minimum supported toolchain
+
+| Toolchain | Minimum version | Notes |
+|-----------|-----------------|-------|
+| GCC       | 5               | `-std=c99 -Wall -Wextra -Wpedantic` |
+| Clang     | 3.5             | same flags |
+| CMake     | 3.13            | required for `target_compile_features` |
+| C standard | C99            | no C11 or compiler extensions |
+
 ## Platform Integration
 
 Your UART send function and `terminal_clear` are the only platform-specific
@@ -127,6 +169,26 @@ is included.
 
 ## Notes
 
+**`MAZARBULIB_TYPE_STRING` contract** — `value_ptr` must be a `const char **`
+(pointer to the string pointer), consistent with all other types. The pointer
+is dereferenced at each render so the display reflects the current string:
+
+```c
+static const char *status = "idle";
+mazarbulib_register_row(&lib, s, "Status", MAZARBULIB_TYPE_STRING, &status);
+// Later:
+status = "running"; // next mazarbulib_tick() will show "running"
+```
+
+A `NULL` inner pointer (i.e. `*value_ptr == NULL`) is rendered as an empty
+string rather than causing undefined behaviour.
+
+**Truncation** — labels longer than `MAZARBULIB_LABEL_WIDTH` and values
+longer than `MAZARBULIB_VALUE_WIDTH` are silently truncated so that table
+borders remain aligned. Screen names longer than
+`MAZARBULIB_LABEL_WIDTH + MAZARBULIB_VALUE_WIDTH + 4` are likewise truncated
+in the title line.
+
 **Thread safety** — MazarbuLib is single-threaded. If `mazarbulib_feed_char`
 is called from a UART ISR while `mazarbulib_tick` runs in the main loop,
 protect the context with a critical section appropriate to your platform.
@@ -135,9 +197,8 @@ protect the context with a critical section appropriate to your platform.
 On Cortex-M0 targets with newlib-nano you may need the linker flag
 `-u _printf_float` to enable floating-point printf support.
 
-**Label length** — labels longer than `MAZARBULIB_LABEL_WIDTH` characters
-are not truncated; they extend past the column border. Keep labels within
-the configured width.
+**Config limits** — `MAZARBULIB_MAX_SCREENS` and `MAZARBULIB_MAX_ROWS_PER_SCREEN`
+are stored in `uint8_t` counters. Values above 255 produce a compile-time error.
 
 ## License
 

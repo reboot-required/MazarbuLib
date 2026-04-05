@@ -16,7 +16,13 @@ SRC := src/mazarbulib.c
 OBJ := $(SRC:.c=.o)
 LIB := libmazarbulib.a
 
-.PHONY: all clean
+EXAMPLE_SRC := examples/posix.c
+EXAMPLE_BIN := mazarbulib_posix_demo
+
+TEST_SRC := tests/test_mazarbulib.c
+TEST_BIN := mazarbulib_test
+
+.PHONY: all clean posix-example test
 
 all: $(LIB)
 
@@ -26,5 +32,12 @@ $(LIB): $(OBJ)
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
+posix-example: $(SRC) $(EXAMPLE_SRC)
+	$(CC) $(CFLAGS) $(SRC) $(EXAMPLE_SRC) -o $(EXAMPLE_BIN)
+
+test: $(SRC) $(TEST_SRC)
+	$(CC) $(CFLAGS) $(SRC) $(TEST_SRC) -o $(TEST_BIN)
+	./$(TEST_BIN)
+
 clean:
-	$(RM) $(OBJ) $(LIB)
+	$(RM) $(OBJ) $(LIB) $(EXAMPLE_BIN) $(TEST_BIN)
