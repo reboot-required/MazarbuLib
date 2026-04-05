@@ -33,6 +33,7 @@ typedef enum {
 // Return codes used throughout the API.
 typedef enum {
   MAZARBULIB_ERR_OK = 0,
+  MAZARBULIB_OK = MAZARBULIB_ERR_OK, // Backwards-compatible alias.
   MAZARBULIB_ERR_FULL = -1,    // Screen table or row table is full.
   MAZARBULIB_ERR_INVALID = -2, // NULL pointer or out-of-range argument.
 } mazarbulib_err_t;
