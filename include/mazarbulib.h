@@ -100,16 +100,16 @@ int mazarbulib_register_screen(mazarbulib_t *ctx, const char *name);
 
 // Registers a data row on the screen at screen_idx.
 // label and value_ptr must remain valid for the lifetime of the context.
-// value_ptr is dereferenced at render time, so the pointed-to value is
-// always live.
+// value_ptr is read at render time, so the pointed-to value is always live.
 //
 // For numeric and bool types, pass the address of your variable:
 //   int32_t rpm = 0;     register_row(..., MAZARBULIB_TYPE_INT32,  &rpm);
 // For strings, pass the const char * directly (not its address):
 //   char msg[32] = "hi"; register_row(..., MAZARBULIB_TYPE_STRING, msg);
 //
-// MAZARBULIB_TYPE_STRING: value_ptr must be a non-NULL const char * pointing
-// directly to the string data. For an empty string pass "".
+// MAZARBULIB_TYPE_STRING: value_ptr must be a non-NULL, NUL-terminated
+// const char * pointing directly to the string data. NULL is not allowed;
+// for an empty string pass "".
 // Label and value strings longer than MAZARBULIB_LABEL_WIDTH /
 // MAZARBULIB_VALUE_WIDTH are truncated to keep table borders aligned.
 //
