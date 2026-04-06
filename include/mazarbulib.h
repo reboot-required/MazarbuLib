@@ -127,7 +127,7 @@ void mazarbulib_prev_screen(mazarbulib_t *ctx);
 
 // Jumps to the screen at screen_idx. No-op if ctx is NULL or screen_idx is
 // out of range.
-void mazarbulib_set_screen(mazarbulib_t *ctx, int screen_idx);
+void mazarbulib_set_screen(mazarbulib_t *ctx, uint8_t screen_idx);
 
 // Feeds a single received byte from the UART RX handler.
 // Handles MAZARBULIB_NAV_NEXT and MAZARBULIB_NAV_PREV; ignores other bytes.

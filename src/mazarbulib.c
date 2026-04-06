@@ -218,21 +218,20 @@ void mazarbulib_prev_screen(mazarbulib_t *ctx) {
                                                  : ctx->active_screen - 1u;
 }
 
-void mazarbulib_set_screen(mazarbulib_t *ctx, int screen_idx) {
-  if (ctx == NULL || screen_idx < 0 ||
-      (uint8_t)screen_idx >= ctx->screen_count) {
+void mazarbulib_set_screen(mazarbulib_t *ctx, uint8_t screen_idx) {
+  if (ctx == NULL || screen_idx >= ctx->screen_count) {
     return;
   }
-  ctx->active_screen = (uint8_t)screen_idx;
+  ctx->active_screen = screen_idx;
 }
 
 void mazarbulib_feed_char(mazarbulib_t *ctx, char c) {
   if (ctx == NULL) {
     return;
   }
-  if (c == MAZARBULIB_NAV_NEXT) {
+  if ((unsigned char)c == (unsigned char)MAZARBULIB_NAV_NEXT) {
     mazarbulib_next_screen(ctx);
-  } else if (c == MAZARBULIB_NAV_PREV) {
+  } else if ((unsigned char)c == (unsigned char)MAZARBULIB_NAV_PREV) {
     mazarbulib_prev_screen(ctx);
   }
 }
