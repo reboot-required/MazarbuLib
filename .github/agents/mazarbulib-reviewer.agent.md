@@ -55,7 +55,12 @@ For every file changed or added, verify:
 
 1. File header present and correct (copyright, GitHub link, SPDX, Tolkien reference).
 2. Include guard matches `MAZARBULIB_INCLUDE_<FILENAME>_H_` pattern.
-3. All identifiers use `mazarbulib_` prefix.
+3. All identifiers use `mazarbulib_` prefix. **Exception**: `tests/test_mazarbulib.c`
+   may use unprefixed test-harness identifiers (`TEST_ASSERT`, `K_TEST_COUNT`,
+   `g_tests_run`, `g_tests_failed`, `g_uart_buf`, `g_uart_len`, `fake_uart_send`,
+   `uart_reset`, `mazarbulib_test_entry_t`, `k_tests`). These are internal to the test binary
+   and do not form part of the public API. `examples/*.c` may also use
+   unprefixed identifiers for demonstration purposes.
 4. No dynamic allocation.
 5. No non-C99 constructs (VLAs used carefully, `//` comments allowed in C99).
 6. Public function pointer arguments checked for NULL.

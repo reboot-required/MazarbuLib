@@ -17,9 +17,8 @@
 // layouts and value formatting without target hardware.
 //
 // Build (from repo root):
-//   gcc -std=c99 -Wall -Wextra -Wpedantic \
-//       -Iinclude examples/posix.c src/mazarbulib.c -o mazarbulib_demo
-//   or: make posix-example
+//   gcc -std=c99 -Wall -Wextra -Wpedantic -Iinclude examples/posix.c
+//   src/mazarbulib.c -o mazarbulib_demo or: make posix-example
 //
 // Run: ./mazarbulib_demo
 //
@@ -34,12 +33,12 @@ static mazarbulib_t g_lib;
 static float temperature = 23.5f;
 static int32_t rpm = 1200;
 
-void uart_send(const char *data, size_t len) {
+static void uart_send(const char *data, size_t len) {
   fwrite(data, 1, len, stdout);
   fflush(stdout);
 }
 
-void terminal_clear(void) {
+static void terminal_clear(void) {
   static const char kSeq[] = "\033[2J\033[H";
   uart_send(kSeq, sizeof(kSeq) - 1);
 }
@@ -67,6 +66,4 @@ int main(void) {
     mazarbulib_tick(&g_lib);
     sleep(1);
   }
-
-  return 0;
 }

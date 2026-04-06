@@ -6,10 +6,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.15)
 
 project(mazarbulib
-  VERSION 0.1.0
+  VERSION 0.1.2
   LANGUAGES C
   DESCRIPTION "UART tabular screen display library for embedded systems"
 )
@@ -54,15 +54,20 @@ if(MAZARBULIB_BUILD_TESTS)
   )
 
   add_test(NAME test_init             COMMAND mazarbulib_test test_init)
-  add_test(NAME test_register_screen  COMMAND mazarbulib_test test_register_screen)
+  add_test(NAME test_register_screen
+           COMMAND mazarbulib_test test_register_screen)
   add_test(NAME test_register_row     COMMAND mazarbulib_test test_register_row)
   add_test(NAME test_navigation       COMMAND mazarbulib_test test_navigation)
-  add_test(NAME test_zero_screen_tick COMMAND mazarbulib_test test_zero_screen_tick)
+  add_test(NAME test_zero_screen_tick
+           COMMAND mazarbulib_test test_zero_screen_tick)
   add_test(NAME test_rendering        COMMAND mazarbulib_test test_rendering)
   add_test(NAME test_string_type      COMMAND mazarbulib_test test_string_type)
   add_test(NAME test_all_types        COMMAND mazarbulib_test test_all_types)
-  add_test(NAME test_empty_string_row COMMAND mazarbulib_test test_empty_string_row)
-  add_test(NAME test_max_screens_rows COMMAND mazarbulib_test test_max_screens_rows)
+  add_test(NAME test_empty_string_row
+           COMMAND mazarbulib_test test_empty_string_row)
+  add_test(NAME test_null_guards      COMMAND mazarbulib_test test_null_guards)
+  add_test(NAME test_max_screens_rows
+           COMMAND mazarbulib_test test_max_screens_rows)
 endif()
 
 # ---------------------------------------------------------------------------
@@ -108,7 +113,7 @@ configure_package_config_file(
 write_basic_package_version_file(
   ${CMAKE_CURRENT_BINARY_DIR}/MazarbuLibConfigVersion.cmake
   VERSION      ${PROJECT_VERSION}
-  COMPATIBILITY SameMajorVersion
+  COMPATIBILITY SameMinorVersion
 )
 
 install(FILES

@@ -65,7 +65,9 @@ void terminal_clear(void) {
 }
 
 void app_init(void) {
-  mazarbulib_init(&g_lib, uart_write, terminal_clear);
+  if (mazarbulib_init(&g_lib, uart_write, terminal_clear) != MAZARBULIB_ERR_OK) {
+    return; // handle error: uart_write was NULL
+  }
 
   int s0 = mazarbulib_register_screen(&g_lib, "Engine Monitor");
   mazarbulib_register_row(&g_lib, s0, "Temperature",
@@ -87,7 +89,7 @@ void uart_rx_callback(char c) {
 
 ### Output example
 
-```
+```text
 === Engine Monitor ===
 +----------------------+-----------------+
 | Temperature          |           23.50 |
@@ -107,10 +109,10 @@ cmake --build build
 
 Optional flags:
 
-| Flag | Default | Effect |
-|------|---------|--------|
-| `-DMAZARBULIB_BUILD_TESTS=ON` | `OFF` | Build and register the test binary |
-| `-DMAZARBULIB_BUILD_EXAMPLES=ON` | `OFF` | Build the POSIX demo executable |
+| Flag                             | Default | Effect                             |
+|----------------------------------|---------|------------------------------------|
+| `-DMAZARBULIB_BUILD_TESTS=ON`    | `OFF`   | Build and register the test binary |
+| `-DMAZARBULIB_BUILD_EXAMPLES=ON` | `OFF`   | Build the POSIX demo executable    |
 
 Run tests after configuring with `-DMAZARBULIB_BUILD_TESTS=ON`:
 
@@ -129,12 +131,12 @@ make clean
 
 ### Minimum supported toolchain
 
-| Toolchain | Minimum version | Notes |
-|-----------|-----------------|-------|
-| GCC       | 5               | `-std=c99 -Wall -Wextra -Wpedantic` |
-| Clang     | 3.5             | same flags |
-| CMake     | 3.13            | required for `target_compile_features` |
-| C standard | C99            | no C11 or compiler extensions |
+| Toolchain  | Minimum version | Notes                                  |
+|------------|-----------------|----------------------------------------|
+| GCC        | 5               | `-std=c99 -Wall -Wextra -Wpedantic`    |
+| Clang      | 3.5             | same flags                             |
+| CMake      | 3.15            | required for `target_compile_features` |
+| C standard | C99             | no C11 or compiler extensions          |
 
 ## Platform Integration
 
@@ -144,9 +146,9 @@ code you need to write. Ready-to-use starting points are in
 
 | Target               | File                                              |
 |----------------------|---------------------------------------------------|
-| STM32 (HAL)          | [`examples/stm32_hal.c`](examples/stm32_hal.c)   |
-| Arduino              | [`examples/arduino.cpp`](examples/arduino.cpp)   |
-| POSIX / host testing | [`examples/posix.c`](examples/posix.c)           |
+| STM32 (HAL)          | [`examples/stm32_hal.c`](examples/stm32_hal.c)    |
+| Arduino              | [`examples/arduino.cpp`](examples/arduino.cpp)    |
+| POSIX / host testing | [`examples/posix.c`](examples/posix.c)            |
 
 Pass `NULL` for `terminal_clear` on targets without ANSI terminal support;
 the library will render without clearing first, causing the output to scroll
@@ -195,7 +197,7 @@ in the title line.
 is called from a UART ISR while `mazarbulib_tick` runs in the main loop,
 protect the context with a critical section appropriate to your platform.
 
-**Float formatting** — `float` and `double` rows use `snprintf` with `%f`.
+**Float formatting** — `float` and `double` rows use `snprintf` with `%.2f`.
 On Cortex-M0 targets with newlib-nano you may need the linker flag
 `-u _printf_float` to enable floating-point printf support.
 
