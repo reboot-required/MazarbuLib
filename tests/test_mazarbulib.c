@@ -210,7 +210,7 @@ static void test_string_type(void) {
   TEST_ASSERT(strstr(g_uart_buf, "idle") != NULL);
 
   // In-place update — the next render must pick up the new string.
-  strncpy(msg, "running", sizeof(msg));
+  snprintf(msg, sizeof(msg), "%s", "running");
   uart_reset();
   mazarbulib_tick(&lib);
   TEST_ASSERT(strstr(g_uart_buf, "running") != NULL);
