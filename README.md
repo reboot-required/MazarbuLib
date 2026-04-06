@@ -135,7 +135,7 @@ make clean
 |------------|-----------------|----------------------------------------|
 | GCC        | 5               | `-std=c99 -Wall -Wextra -Wpedantic`    |
 | Clang      | 3.5             | same flags                             |
-| CMake      | 3.13            | required for `target_compile_features` |
+| CMake      | 3.15            | required for `target_compile_features` |
 | C standard | C99             | no C11 or compiler extensions          |
 
 ## Platform Integration
