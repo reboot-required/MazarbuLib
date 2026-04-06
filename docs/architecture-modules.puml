@@ -1,0 +1,71 @@
+@startuml
+title MazarbuLib - Module / Repository Architecture
+
+skinparam backgroundColor white
+skinparam componentStyle rectangle
+skinparam shadowing false
+left to right direction
+
+package "Repository: reboot-required/MazarbuLib" {
+
+  package "include/" {
+    [mazarbulib.h] as H
+    [mazarbulib_config.h] as CFG
+  }
+
+  package "src/" {
+    [mazarbulib.c] as C
+  }
+
+  package "examples/" {
+    [posix.c] as EX_POSIX
+    [stm32_hal.c] as EX_STM32
+    [arduino.cpp] as EX_ARD
+  }
+
+  package "tests/" {
+    [test_mazarbulib.c] as TEST
+  }
+
+  package "build system" {
+    [CMakeLists.txt] as CMAKE
+    [Makefile] as MK
+    [cmake/MazarbuLibConfig.cmake.in] as CMAKECFG
+    [library.json] as PIO
+  }
+}
+
+CFG --> H : configuration macros
+H --> C : public declarations used by implementation
+
+EX_POSIX --> H : uses API
+EX_STM32 --> H : uses API
+EX_ARD --> H : uses API
+
+TEST --> H : tests public API
+TEST --> C : validates behavior indirectly
+
+CMAKE --> C : builds static library
+CMAKE --> H : exports include path
+CMAKE --> TEST : optional test target
+CMAKE --> EX_POSIX : optional example target
+
+MK --> C : builds library
+MK --> TEST : builds/runs tests
+MK --> EX_POSIX : builds demo
+
+PIO --> H : package metadata
+PIO --> C : package metadata
+
+note bottom of C
+Core responsibilities:
+- context initialization
+- screen registration
+- row registration
+- navigation
+- value formatting
+- table rendering
+- UART output
+end note
+
+@enduml
