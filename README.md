@@ -65,7 +65,9 @@ void terminal_clear(void) {
 }
 
 void app_init(void) {
-  mazarbulib_init(&g_lib, uart_write, terminal_clear);
+  if (mazarbulib_init(&g_lib, uart_write, terminal_clear) != MAZARBULIB_ERR_OK) {
+    return; // handle error: uart_write was NULL
+  }
 
   int s0 = mazarbulib_register_screen(&g_lib, "Engine Monitor");
   mazarbulib_register_row(&g_lib, s0, "Temperature",
@@ -87,7 +89,7 @@ void uart_rx_callback(char c) {
 
 ### Output example
 
-``` "C"
+```text
 === Engine Monitor ===
 +----------------------+-----------------+
 | Temperature          |           23.50 |
@@ -195,7 +197,7 @@ in the title line.
 is called from a UART ISR while `mazarbulib_tick` runs in the main loop,
 protect the context with a critical section appropriate to your platform.
 
-**Float formatting** — `float` and `double` rows use `snprintf` with `%f`.
+**Float formatting** — `float` and `double` rows use `snprintf` with `%.2f`.
 On Cortex-M0 targets with newlib-nano you may need the linker flag
 `-u _printf_float` to enable floating-point printf support.
 

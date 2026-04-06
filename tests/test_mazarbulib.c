@@ -11,6 +11,7 @@
 
 #include "mazarbulib.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -38,11 +39,10 @@ static char g_uart_buf[4096];
 static size_t g_uart_len = 0;
 
 static void fake_uart_send(const char *data, size_t len) {
-  if (g_uart_len + len < sizeof(g_uart_buf)) {
-    memcpy(g_uart_buf + g_uart_len, data, len);
-    g_uart_len += len;
-    g_uart_buf[g_uart_len] = '\0';
-  }
+  assert(g_uart_len + len < sizeof(g_uart_buf));
+  memcpy(g_uart_buf + g_uart_len, data, len);
+  g_uart_len += len;
+  g_uart_buf[g_uart_len] = '\0';
 }
 
 static void uart_reset(void) {
@@ -263,6 +263,15 @@ static void test_empty_string_row(void) {
   TEST_ASSERT(strstr(g_uart_buf, "label") != NULL);
 }
 
+static void test_null_guards(void) {
+  // All NULL-ctx paths must be no-ops and must not crash.
+  mazarbulib_tick(NULL);
+  mazarbulib_next_screen(NULL);
+  mazarbulib_prev_screen(NULL);
+  mazarbulib_feed_char(NULL, MAZARBULIB_NAV_NEXT);
+  mazarbulib_set_screen(NULL, 0);
+}
+
 static void test_max_screens_rows(void) {
   mazarbulib_t lib;
   mazarbulib_init(&lib, fake_uart_send, NULL);
@@ -307,6 +316,7 @@ static const mazarbulib_test_entry_t k_tests[] = {
     {"test_string_type", test_string_type},
     {"test_all_types", test_all_types},
     {"test_empty_string_row", test_empty_string_row},
+    {"test_null_guards", test_null_guards},
     {"test_max_screens_rows", test_max_screens_rows},
 };
 

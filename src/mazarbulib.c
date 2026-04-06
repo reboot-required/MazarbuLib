@@ -28,11 +28,8 @@ typedef char mazarbulib_assert_rows_fit_uint8_
 
 // Maximum number of characters from the screen name that fit on the title
 // line ("=== <name> ===\r\n") within MAZARBULIB_LINE_BUF_SIZE_.
-// The fixed overhead of "===  ===\r\n\0" is 11 bytes; subtract one more byte
-// to preserve the current visible-name limit while deriving it from the line
-// buffer size directly.
-#define MAZARBULIB_TITLE_MAX_LEN_                                              \
-  (MAZARBULIB_LINE_BUF_SIZE_ - 12)
+// Fixed overhead: "=== " (4) + " ===\r\n" (7) + NUL (1) = 12 bytes.
+#define MAZARBULIB_TITLE_MAX_LEN_ (MAZARBULIB_LINE_BUF_SIZE_ - 12)
 
 // Dash count for each table border segment (column width + two spaces).
 #define MAZARBULIB_LABEL_SEG_LEN_ (MAZARBULIB_LABEL_WIDTH + 2)
@@ -94,11 +91,9 @@ static void mazarbulib_format_value_(const mazarbulib_row_t *row, char *buf,
   case MAZARBULIB_TYPE_DOUBLE:
     snprintf(buf, buf_len, "%.2f", *(const double *)row->value_ptr);
     break;
-  case MAZARBULIB_TYPE_STRING: {
-    const char *s = (const char *)row->value_ptr;
-    snprintf(buf, buf_len, "%s", (s != NULL) ? s : "");
+  case MAZARBULIB_TYPE_STRING:
+    snprintf(buf, buf_len, "%s", (const char *)row->value_ptr);
     break;
-  }
   case MAZARBULIB_TYPE_BOOL:
     snprintf(buf, buf_len, "%s",
              *(const bool *)row->value_ptr ? "true" : "false");
@@ -148,7 +143,7 @@ static void mazarbulib_render_screen_(mazarbulib_t *ctx) {
   mazarbulib_send_separator_(ctx);
 
   // Navigation footer.
-  n = snprintf(line, sizeof(line), "[%c]ext  [%c]rev  (%u/%u)\r\n",
+  n = snprintf(line, sizeof(line), "[%c]=next  [%c]=prev  (%u/%u)\r\n",
                MAZARBULIB_NAV_NEXT, MAZARBULIB_NAV_PREV,
                (unsigned)(ctx->active_screen + 1u),
                (unsigned)ctx->screen_count);
@@ -223,11 +218,12 @@ void mazarbulib_prev_screen(mazarbulib_t *ctx) {
                                                  : ctx->active_screen - 1u;
 }
 
-void mazarbulib_set_screen(mazarbulib_t *ctx, uint8_t screen_idx) {
-  if (ctx == NULL || screen_idx >= ctx->screen_count) {
+void mazarbulib_set_screen(mazarbulib_t *ctx, int screen_idx) {
+  if (ctx == NULL || screen_idx < 0 ||
+      (uint8_t)screen_idx >= ctx->screen_count) {
     return;
   }
-  ctx->active_screen = screen_idx;
+  ctx->active_screen = (uint8_t)screen_idx;
 }
 
 void mazarbulib_feed_char(mazarbulib_t *ctx, char c) {
