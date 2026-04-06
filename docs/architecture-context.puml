@@ -1,0 +1,38 @@
+@startuml
+title MazarbuLib - System Context
+
+skinparam backgroundColor white
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+actor "Embedded Application" as App
+actor "UART RX Source\n(ISR / callback / serial input)" as Rx
+actor "UART TX Sink\n(terminal / serial monitor)" as Tx
+
+rectangle "MazarbuLib\nPortable C99 UART table rendering library" as Lib {
+  component "Public API\ninclude/mazarbulib.h" as API
+  component "Core Implementation\nsrc/mazarbulib.c" as Core
+  component "Compile-time Config\ninclude/mazarbulib_config.h" as Config
+}
+
+rectangle "Platform Adapter Code\n(user supplied)" as Platform {
+  component "uart_send(data,len)" as UartSend
+  component "screen_clear()" as ScreenClear
+}
+
+App --> API : init/register/tick
+Rx --> API : feed received char
+API --> Core : API calls
+Config --> API : macro limits
+Config --> Core : macro limits
+Core --> UartSend : transmit rendered output
+Core --> ScreenClear : optional clear before redraw
+UartSend --> Tx : UART bytes
+
+note right of Lib
+Single-threaded, static allocation only,
+no malloc, no OS dependencies,
+one translation unit.
+end note
+
+@enduml

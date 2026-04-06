@@ -1,0 +1,60 @@
+@startuml
+title MazarbuLib - Core Runtime Flow
+
+skinparam backgroundColor white
+skinparam shadowing false
+
+actor "Application" as App
+actor "UART RX callback" as RX
+actor "UART terminal" as TERM
+
+participant "mazarbulib.h\nPublic API" as API
+participant "mazarbulib_t\nContext" as CTX
+participant "mazarbulib.c\nCore" as CORE
+participant "uart_send()" as TX
+participant "screen_clear()" as CLR
+
+== Initialization ==
+App -> API : mazarbulib_init(ctx, uart_send, screen_clear)
+API -> CORE : initialize context
+CORE -> CTX : zero state, store callbacks
+
+== Setup ==
+App -> API : mazarbulib_register_screen(ctx, name)
+API -> CORE : append screen
+CORE -> CTX : screens[] / screen_count update
+
+App -> API : mazarbulib_register_row(ctx, screen_idx, label, type, value_ptr)
+API -> CORE : append row
+CORE -> CTX : rows[] / row_count update
+
+== Navigation ==
+RX -> API : mazarbulib_feed_char(ctx, c)
+API -> CORE : decode nav char
+alt next char
+  CORE -> CTX : active_screen = next
+else prev char
+  CORE -> CTX : active_screen = previous
+else ignored char
+  CORE -> CTX : no change
+end
+
+== Periodic render ==
+App -> API : mazarbulib_tick(ctx)
+API -> CORE : render active screen
+opt screen_clear != NULL
+  CORE -> CLR : clear terminal
+end
+
+loop for each row in active screen
+  CORE -> CORE : format value from value_ptr\nbased on row type
+end
+
+CORE -> TX : title line
+CORE -> TX : top separator
+CORE -> TX : formatted row lines
+CORE -> TX : bottom separator
+CORE -> TX : navigation footer
+TX -> TERM : UART byte stream
+
+@enduml
