@@ -54,16 +54,20 @@ if(MAZARBULIB_BUILD_TESTS)
   )
 
   add_test(NAME test_init             COMMAND mazarbulib_test test_init)
-  add_test(NAME test_register_screen  COMMAND mazarbulib_test test_register_screen)
+  add_test(NAME test_register_screen
+           COMMAND mazarbulib_test test_register_screen)
   add_test(NAME test_register_row     COMMAND mazarbulib_test test_register_row)
   add_test(NAME test_navigation       COMMAND mazarbulib_test test_navigation)
-  add_test(NAME test_zero_screen_tick COMMAND mazarbulib_test test_zero_screen_tick)
+  add_test(NAME test_zero_screen_tick
+           COMMAND mazarbulib_test test_zero_screen_tick)
   add_test(NAME test_rendering        COMMAND mazarbulib_test test_rendering)
   add_test(NAME test_string_type      COMMAND mazarbulib_test test_string_type)
   add_test(NAME test_all_types        COMMAND mazarbulib_test test_all_types)
-  add_test(NAME test_empty_string_row COMMAND mazarbulib_test test_empty_string_row)
+  add_test(NAME test_empty_string_row
+           COMMAND mazarbulib_test test_empty_string_row)
   add_test(NAME test_null_guards      COMMAND mazarbulib_test test_null_guards)
-  add_test(NAME test_max_screens_rows COMMAND mazarbulib_test test_max_screens_rows)
+  add_test(NAME test_max_screens_rows
+           COMMAND mazarbulib_test test_max_screens_rows)
 endif()
 
 # ---------------------------------------------------------------------------

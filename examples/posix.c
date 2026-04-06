@@ -27,7 +27,9 @@
 #include "mazarbulib.h"
 
 #include <stdio.h>
+#ifdef _POSIX_C_SOURCE
 #include <unistd.h>
+#endif
 
 static mazarbulib_t g_lib;
 static float temperature = 23.5f;

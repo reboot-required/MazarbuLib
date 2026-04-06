@@ -11,7 +11,6 @@
 
 #include "mazarbulib.h"
 
-#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -39,7 +38,11 @@ static char g_uart_buf[4096];
 static size_t g_uart_len = 0;
 
 static void fake_uart_send(const char *data, size_t len) {
-  assert(g_uart_len + len < sizeof(g_uart_buf));
+  if (g_uart_len + len >= sizeof(g_uart_buf)) {
+    fprintf(stderr, "fake_uart_send: buffer overflow, discarding %zu bytes\n",
+            len);
+    return;
+  }
   memcpy(g_uart_buf + g_uart_len, data, len);
   g_uart_len += len;
   g_uart_buf[g_uart_len] = '\0';

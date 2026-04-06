@@ -207,7 +207,8 @@ void mazarbulib_next_screen(mazarbulib_t *ctx) {
   if (ctx == NULL || ctx->screen_count == 0) {
     return;
   }
-  ctx->active_screen = (uint8_t)((ctx->active_screen + 1u) % ctx->screen_count);
+  ctx->active_screen =
+      (uint8_t)((ctx->active_screen + 1u) % ctx->screen_count);
 }
 
 void mazarbulib_prev_screen(mazarbulib_t *ctx) {

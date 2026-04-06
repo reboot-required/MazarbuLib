@@ -21,7 +21,6 @@
 #include "mazarbulib.h"
 #include "stm32xxxx_hal.h" // replace xxxx with your device family
 #include "usart.h"         // CubeMX-generated; declares huart1
-#include <assert.h>
 
 // Adjust to the UART handle connected to your terminal.
 extern UART_HandleTypeDef huart1;
@@ -33,7 +32,10 @@ static int32_t rpm = 1200;
 static void uart_send(const char *data, size_t len) {
   /* HAL_UART_Transmit takes uint8_t * but does not write to the buffer.
    * The const-discard cast is intentional and safe given the HAL ABI. */
-  assert(len <= UINT16_MAX);
+  if (len > UINT16_MAX) {
+    Error_Handler();
+    return;
+  }
   HAL_UART_Transmit(&huart1, (uint8_t *)(void *)data, (uint16_t)len,
                     HAL_MAX_DELAY);
 }
