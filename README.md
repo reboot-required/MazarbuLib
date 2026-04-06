@@ -169,19 +169,21 @@ is included.
 
 ## Notes
 
-**`MAZARBULIB_TYPE_STRING` contract** — `value_ptr` must be a `const char **`
-(pointer to the string pointer), consistent with all other types. The pointer
-is dereferenced at each render so the display reflects the current string:
+**`MAZARBULIB_TYPE_STRING` contract** — `value_ptr` must be a non-NULL
+`const char *` pointing directly to the string data. Pass the pointer itself,
+not its address:
 
 ```c
-static const char *status = "idle";
-mazarbulib_register_row(&lib, s, "Status", MAZARBULIB_TYPE_STRING, &status);
+char status[16] = "idle";
+mazarbulib_register_row(&lib, s, "Status", MAZARBULIB_TYPE_STRING, status);
 // Later:
-status = "running"; // next mazarbulib_tick() will show "running"
+strncpy(status, "running", sizeof(status) - 1);
+status[sizeof(status) - 1] = '\0'; // next mazarbulib_tick() will show "running"
 ```
 
-A `NULL` inner pointer (i.e. `*value_ptr == NULL`) is rendered as an empty
-string rather than causing undefined behaviour.
+For an empty string pass `""`. To display a string whose pointer may change
+at runtime, keep the pointer itself stable (e.g. a fixed-size char array or a
+persistent buffer) and update its contents in place.
 
 **Truncation** — labels longer than `MAZARBULIB_LABEL_WIDTH` and values
 longer than `MAZARBULIB_VALUE_WIDTH` are silently truncated so that table
