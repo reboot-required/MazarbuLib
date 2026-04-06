@@ -1,6 +1,6 @@
 {
   "name": "mazarbulib",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "UART tabular screen display library for embedded systems",
   "license": "MIT",
   "homepage": "https://github.com/reboot-required/MazarbuLib",
