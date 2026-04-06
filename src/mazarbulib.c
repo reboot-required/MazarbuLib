@@ -95,10 +95,7 @@ static void mazarbulib_format_value_(const mazarbulib_row_t *row, char *buf,
     snprintf(buf, buf_len, "%.2f", *(const double *)row->value_ptr);
     break;
   case MAZARBULIB_TYPE_STRING: {
-    // value_ptr is a const char ** — dereference to get the current string
-    // pointer, consistent with all other types. A NULL inner pointer renders
-    // as an empty string.
-    const char *s = *(const char **)row->value_ptr;
+    const char *s = (const char *)row->value_ptr;
     snprintf(buf, buf_len, "%s", (s != NULL) ? s : "");
     break;
   }
