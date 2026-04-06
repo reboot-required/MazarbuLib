@@ -87,7 +87,7 @@ void uart_rx_callback(char c) {
 
 ### Output example
 
-```
+``` "C"
 === Engine Monitor ===
 +----------------------+-----------------+
 | Temperature          |           23.50 |
@@ -107,10 +107,10 @@ cmake --build build
 
 Optional flags:
 
-| Flag | Default | Effect |
-|------|---------|--------|
-| `-DMAZARBULIB_BUILD_TESTS=ON` | `OFF` | Build and register the test binary |
-| `-DMAZARBULIB_BUILD_EXAMPLES=ON` | `OFF` | Build the POSIX demo executable |
+| Flag                             | Default | Effect                             |
+|----------------------------------|---------|------------------------------------|
+| `-DMAZARBULIB_BUILD_TESTS=ON`    | `OFF`   | Build and register the test binary |
+| `-DMAZARBULIB_BUILD_EXAMPLES=ON` | `OFF`   | Build the POSIX demo executable    |
 
 Run tests after configuring with `-DMAZARBULIB_BUILD_TESTS=ON`:
 
@@ -129,12 +129,12 @@ make clean
 
 ### Minimum supported toolchain
 
-| Toolchain | Minimum version | Notes |
-|-----------|-----------------|-------|
-| GCC       | 5               | `-std=c99 -Wall -Wextra -Wpedantic` |
-| Clang     | 3.5             | same flags |
-| CMake     | 3.13            | required for `target_compile_features` |
-| C standard | C99            | no C11 or compiler extensions |
+| Toolchain  | Minimum version | Notes                                  |
+|------------|-----------------|----------------------------------------|
+| GCC        | 5               | `-std=c99 -Wall -Wextra -Wpedantic`    |
+| Clang      | 3.5             | same flags                             |
+| CMake      | 3.13            | required for `target_compile_features` |
+| C standard | C99             | no C11 or compiler extensions          |
 
 ## Platform Integration
 
@@ -144,9 +144,9 @@ code you need to write. Ready-to-use starting points are in
 
 | Target               | File                                              |
 |----------------------|---------------------------------------------------|
-| STM32 (HAL)          | [`examples/stm32_hal.c`](examples/stm32_hal.c)   |
-| Arduino              | [`examples/arduino.cpp`](examples/arduino.cpp)   |
-| POSIX / host testing | [`examples/posix.c`](examples/posix.c)           |
+| STM32 (HAL)          | [`examples/stm32_hal.c`](examples/stm32_hal.c)    |
+| Arduino              | [`examples/arduino.cpp`](examples/arduino.cpp)    |
+| POSIX / host testing | [`examples/posix.c`](examples/posix.c)            |
 
 Pass `NULL` for `terminal_clear` on targets without ANSI terminal support;
 the library will render without clearing first, causing the output to scroll
