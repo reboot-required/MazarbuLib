@@ -195,32 +195,25 @@ static void test_rendering(void) {
 }
 
 static void test_string_type(void) {
-  // MAZARBULIB_TYPE_STRING: value_ptr must be a const char ** (pointer to the
-  // string pointer), consistent with all other types.  The render dereferences
-  // it so that updates to the pointer are visible at each tick.
+  // MAZARBULIB_TYPE_STRING: value_ptr is the const char * itself — pass the
+  // buffer address directly, not the address of a pointer variable.
+  // In-place mutations to the buffer are visible at each tick.
   mazarbulib_t lib;
   mazarbulib_init(&lib, fake_uart_send, NULL);
 
   int s0 = mazarbulib_register_screen(&lib, "Status");
-  static const char *msg = "idle";
-  mazarbulib_register_row(&lib, s0, "State", MAZARBULIB_TYPE_STRING, &msg);
+  static char msg[32] = "idle";
+  mazarbulib_register_row(&lib, s0, "State", MAZARBULIB_TYPE_STRING, msg);
 
   uart_reset();
   mazarbulib_tick(&lib);
   TEST_ASSERT(strstr(g_uart_buf, "idle") != NULL);
 
-  // Update the pointer — the next render must pick up the new value.
-  msg = "running";
+  // In-place update — the next render must pick up the new string.
+  snprintf(msg, sizeof(msg), "%s", "running");
   uart_reset();
   mazarbulib_tick(&lib);
   TEST_ASSERT(strstr(g_uart_buf, "running") != NULL);
-
-  // NULL inner pointer must not crash; library renders empty string.
-  msg = NULL;
-  uart_reset();
-  mazarbulib_tick(&lib);
-  // As long as tick() returns without aborting the test passes.
-  TEST_ASSERT(1);
 }
 
 static void test_all_types(void) {
@@ -241,7 +234,7 @@ static void test_all_types(void) {
   mazarbulib_register_row(&lib, s0, "u32", MAZARBULIB_TYPE_UINT32, &u32);
   mazarbulib_register_row(&lib, s0, "f", MAZARBULIB_TYPE_FLOAT, &f);
   mazarbulib_register_row(&lib, s0, "d", MAZARBULIB_TYPE_DOUBLE, &d);
-  mazarbulib_register_row(&lib, s0, "str", MAZARBULIB_TYPE_STRING, &str);
+  mazarbulib_register_row(&lib, s0, "str", MAZARBULIB_TYPE_STRING, str);
   mazarbulib_register_row(&lib, s0, "bool", MAZARBULIB_TYPE_BOOL, &b);
   mazarbulib_register_row(&lib, s0, "hex", MAZARBULIB_TYPE_HEX, &hex);
 
@@ -263,7 +256,7 @@ static void test_empty_string_row(void) {
 
   int s0 = mazarbulib_register_screen(&lib, "S");
   static const char *empty = "";
-  mazarbulib_register_row(&lib, s0, "label", MAZARBULIB_TYPE_STRING, &empty);
+  mazarbulib_register_row(&lib, s0, "label", MAZARBULIB_TYPE_STRING, empty);
 
   uart_reset();
   mazarbulib_tick(&lib); // Must not crash or produce corrupt output.
@@ -305,16 +298,16 @@ typedef struct {
 } mazarbulib_test_entry_t;
 
 static const mazarbulib_test_entry_t k_tests[] = {
-  { "test_init",              test_init              },
-  { "test_register_screen",   test_register_screen   },
-  { "test_register_row",      test_register_row      },
-  { "test_navigation",        test_navigation        },
-  { "test_zero_screen_tick",  test_zero_screen_tick  },
-  { "test_rendering",         test_rendering         },
-  { "test_string_type",       test_string_type       },
-  { "test_all_types",         test_all_types         },
-  { "test_empty_string_row",  test_empty_string_row  },
-  { "test_max_screens_rows",  test_max_screens_rows  },
+    {"test_init", test_init},
+    {"test_register_screen", test_register_screen},
+    {"test_register_row", test_register_row},
+    {"test_navigation", test_navigation},
+    {"test_zero_screen_tick", test_zero_screen_tick},
+    {"test_rendering", test_rendering},
+    {"test_string_type", test_string_type},
+    {"test_all_types", test_all_types},
+    {"test_empty_string_row", test_empty_string_row},
+    {"test_max_screens_rows", test_max_screens_rows},
 };
 
 #define K_TEST_COUNT ((int)(sizeof(k_tests) / sizeof(k_tests[0])))
@@ -328,12 +321,12 @@ int main(int argc, char **argv) {
       if (strcmp(argv[1], k_tests[i].name) == 0) {
         k_tests[i].fn();
         if (g_tests_failed > 0) {
-          fprintf(stderr, "%d/%d assertions FAILED in %s\n",
-                  g_tests_failed, g_tests_run, argv[1]);
+          fprintf(stderr, "%d/%d assertions FAILED in %s\n", g_tests_failed,
+                  g_tests_run, argv[1]);
           return 1;
         }
-        printf("%d/%d assertions passed in %s\n",
-               g_tests_run, g_tests_run, argv[1]);
+        printf("%d/%d assertions passed in %s\n", g_tests_run, g_tests_run,
+               argv[1]);
         return 0;
       }
     }
