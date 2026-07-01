@@ -1,0 +1,5 @@
+{
+  "cmake.configureArgs": [
+    "-DMAZARBULIB_BUILD_TESTS=ON"
+  ]
+}

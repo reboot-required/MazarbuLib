@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Lukas Kraft
 // https://github.com/reboot-required
 //
-// Part of MazarbuLib — a UART screen display library for embedded systems.
+// Part of MazarbuLib, a UART screen display library for embedded systems.
 // Named after the Book of Mazarbul from J.R.R. Tolkien's writings.
 //
 // SPDX-License-Identifier: MIT
@@ -39,4 +39,4 @@
 #define MAZARBULIB_NAV_PREV 'p'
 #endif
 
-#endif // MAZARBULIB_INCLUDE_MAZARBULIB_CONFIG_H_
+#endif  // MAZARBULIB_INCLUDE_MAZARBULIB_CONFIG_H_

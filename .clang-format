@@ -1,0 +1,21 @@
+# Copyright (c) 2026 Lukas Kraft
+# https://github.com/reboot-required
+#
+# Part of MazarbuLib, a UART screen display library for embedded systems.
+# Named after the Book of Mazarbul from J.R.R. Tolkien's writings.
+#
+# SPDX-License-Identifier: MIT
+#
+# Google C++ style applied to C, tuned to MazarbuLib's existing conventions:
+#   - Pointers bind to the name (char *p), not the type (char* p).
+#   - Include blocks are preserved as written (project header first, then a
+#     blank line, then system headers) rather than re-sorted.
+#   - switch/case labels are not extra-indented.
+---
+BasedOnStyle: Google
+ColumnLimit: 80
+PointerAlignment: Right
+DerivePointerAlignment: false
+IncludeBlocks: Preserve
+SortIncludes: false
+IndentCaseLabels: false

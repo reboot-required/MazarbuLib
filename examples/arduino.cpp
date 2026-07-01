@@ -1,17 +1,13 @@
 // Copyright (c) 2026 Lukas Kraft
 // https://github.com/reboot-required
 //
-// Part of MazarbuLib — a UART screen display library for embedded systems.
+// Part of MazarbuLib, a UART screen display library for embedded systems.
 // Named after the Book of Mazarbul from J.R.R. Tolkien's writings.
 //
 // SPDX-License-Identifier: MIT
 
-// Arduino integration example.
-//
-// NOTE: This file is a reference illustration of how MazarbuLib could be
-// integrated on this platform. It is not production-ready code — adapt it
-// to your project's actual peripheral configuration, error handling strategy,
-// and coding standards before use.
+// Arduino integration example. Reference integration, not production-ready;
+// adapt the peripheral setup and error handling to your project before use.
 //
 // Uses the default Serial port at 115200 baud. Swap Serial for Serial1,
 // Serial2, etc. if your display terminal is on a different hardware UART.

@@ -1,0 +1,22 @@
+# Copyright (c) 2026 Lukas Kraft
+# https://github.com/reboot-required
+#
+# Part of MazarbuLib, a UART screen display library for embedded systems.
+# Named after the Book of Mazarbul from J.R.R. Tolkien's writings.
+#
+# SPDX-License-Identifier: MIT
+#
+# Conservative check set: bug-prone patterns, portability, and the static
+# analyzer, minus checks that clash with this codebase's deliberate idioms
+# (short local names, the compile-time-guard typedefs, intentional truncation).
+Checks: >
+  bugprone-*,
+  clang-analyzer-*,
+  performance-*,
+  portability-*,
+  misc-*,
+  -bugprone-easily-swappable-parameters,
+  -misc-include-cleaner,
+  -misc-no-recursion
+WarningsAsErrors: ''
+HeaderFilterRegex: 'mazarbulib.*\.h$'

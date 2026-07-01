@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Lukas Kraft
 # https://github.com/reboot-required
 #
-# Part of MazarbuLib — a UART screen display library for embedded systems.
+# Part of MazarbuLib, a UART screen display library for embedded systems.
 # Named after the Book of Mazarbul from J.R.R. Tolkien's writings.
 #
 # SPDX-License-Identifier: MIT
@@ -13,35 +13,103 @@ on:
   pull_request:
 
 jobs:
-  build:
+  # ---------------------------------------------------------------------------
+  # Formatting: every source file must match .clang-format.
+  # ---------------------------------------------------------------------------
+  format:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
-      # -----------------------------------------------------------------------
-      # CMake build path
-      # -----------------------------------------------------------------------
-      - name: Configure — CMake
+      - name: clang-format check
+        run: |
+          clang-format --version
+          clang-format --dry-run --Werror \
+            src/*.c include/*.h tests/*.c examples/*.c examples/*.cpp
+
+  # ---------------------------------------------------------------------------
+  # Build + test on GCC and Clang, warnings promoted to errors.
+  # ---------------------------------------------------------------------------
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        cc: [gcc, clang]
+    env:
+      CC: ${{ matrix.cc }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Clang
+        if: matrix.cc == 'clang'
+        run: sudo apt-get update && sudo apt-get install -y clang
+
+      # ----- CMake build path -----
+      - name: Configure (CMake)
         run: |
           cmake -B build \
             -DMAZARBULIB_BUILD_TESTS=ON \
-            -DMAZARBULIB_BUILD_EXAMPLES=ON
+            -DMAZARBULIB_BUILD_EXAMPLES=ON \
+            -DMAZARBULIB_WARNINGS_AS_ERRORS=ON
 
-      - name: Build — CMake
+      - name: Build (CMake)
         run: cmake --build build
 
-      - name: Run tests — CMake / CTest
+      - name: Run tests (CMake / CTest)
         run: ctest --test-dir build --output-on-failure
 
-      # -----------------------------------------------------------------------
-      # Makefile build path
-      # -----------------------------------------------------------------------
-      - name: Build library — Makefile
-        run: make
+      # ----- Makefile build path -----
+      - name: Build library (Makefile)
+        run: make CFLAGS="-std=c99 -Wall -Wextra -Wpedantic -Werror"
 
-      - name: Build posix example — Makefile
-        run: make posix-example
+      - name: Build posix example (Makefile)
+        run: make posix-example CFLAGS="-std=c99 -Wall -Wextra -Wpedantic -Werror"
 
-      - name: Build and run tests — Makefile
-        run: make test
+      - name: Build and run tests (Makefile)
+        run: make test CFLAGS="-std=c99 -Wall -Wextra -Wpedantic -Werror"
+
+  # ---------------------------------------------------------------------------
+  # Sanitizers: run the test suite under AddressSanitizer + UBSan.
+  # ---------------------------------------------------------------------------
+  sanitizers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure + build + test with sanitizers
+        run: |
+          cmake -B build \
+            -DMAZARBULIB_BUILD_TESTS=ON \
+            -DMAZARBULIB_BUILD_EXAMPLES=ON \
+            -DMAZARBULIB_ENABLE_SANITIZERS=ON
+          cmake --build build
+          ctest --test-dir build --output-on-failure
+
+  # ---------------------------------------------------------------------------
+  # Static analysis. Advisory for now (continue-on-error) until the findings
+  # have been baselined on a real CI run; promote to required afterwards.
+  # ---------------------------------------------------------------------------
+  static-analysis:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install analyzers
+        run: sudo apt-get update && sudo apt-get install -y cppcheck clang-tidy
+
+      - name: cppcheck
+        run: |
+          cppcheck --std=c99 \
+            --enable=warning,style,performance,portability \
+            --error-exitcode=1 --inline-suppr \
+            -Iinclude src tests examples/posix.c
+
+      - name: clang-tidy
+        run: |
+          cmake -B build \
+            -DMAZARBULIB_BUILD_TESTS=ON \
+            -DMAZARBULIB_BUILD_EXAMPLES=ON \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          clang-tidy -p build src/mazarbulib.c

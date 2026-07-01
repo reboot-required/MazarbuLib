@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Lukas Kraft
 // https://github.com/reboot-required
 //
-// Part of MazarbuLib — a UART screen display library for embedded systems.
+// Part of MazarbuLib, a UART screen display library for embedded systems.
 // Named after the Book of Mazarbul from J.R.R. Tolkien's writings.
 //
 // SPDX-License-Identifier: MIT
@@ -21,13 +21,13 @@
 static int g_tests_run = 0;
 static int g_tests_failed = 0;
 
-#define TEST_ASSERT(cond)                                                      \
-  do {                                                                         \
-    g_tests_run++;                                                             \
-    if (!(cond)) {                                                             \
-      fprintf(stderr, "FAIL  %s:%d  %s\n", __FILE__, __LINE__, #cond);         \
-      g_tests_failed++;                                                        \
-    }                                                                          \
+#define TEST_ASSERT(cond)                                              \
+  do {                                                                 \
+    g_tests_run++;                                                     \
+    if (!(cond)) {                                                     \
+      fprintf(stderr, "FAIL  %s:%d  %s\n", __FILE__, __LINE__, #cond); \
+      g_tests_failed++;                                                \
+    }                                                                  \
   } while (0)
 
 // ---------------------------------------------------------------------------
@@ -142,16 +142,16 @@ static void test_navigation(void) {
   mazarbulib_next_screen(&lib);
   TEST_ASSERT(lib.active_screen == 2);
 
-  mazarbulib_next_screen(&lib); // Wrap forward.
+  mazarbulib_next_screen(&lib);  // Wrap forward.
   TEST_ASSERT(lib.active_screen == 0);
 
-  mazarbulib_prev_screen(&lib); // Wrap backward.
+  mazarbulib_prev_screen(&lib);  // Wrap backward.
   TEST_ASSERT(lib.active_screen == 2);
 
   mazarbulib_set_screen(&lib, 1);
   TEST_ASSERT(lib.active_screen == 1);
 
-  mazarbulib_set_screen(&lib, 99); // Out of range: no-op.
+  mazarbulib_set_screen(&lib, 99);  // Out of range: no-op.
   TEST_ASSERT(lib.active_screen == 1);
 
   mazarbulib_set_screen(&lib, 0);
@@ -198,7 +198,7 @@ static void test_rendering(void) {
 }
 
 static void test_string_type(void) {
-  // MAZARBULIB_TYPE_STRING: value_ptr is the const char * itself — pass the
+  // MAZARBULIB_TYPE_STRING: value_ptr is the const char * itself; pass the
   // buffer address directly, not the address of a pointer variable.
   // In-place mutations to the buffer are visible at each tick.
   mazarbulib_t lib;
@@ -212,7 +212,7 @@ static void test_string_type(void) {
   mazarbulib_tick(&lib);
   TEST_ASSERT(strstr(g_uart_buf, "idle") != NULL);
 
-  // In-place update — the next render must pick up the new string.
+  // In-place update: the next render must pick up the new string.
   snprintf(msg, sizeof(msg), "%s", "running");
   uart_reset();
   mazarbulib_tick(&lib);
@@ -262,7 +262,7 @@ static void test_empty_string_row(void) {
   mazarbulib_register_row(&lib, s0, "label", MAZARBULIB_TYPE_STRING, empty);
 
   uart_reset();
-  mazarbulib_tick(&lib); // Must not crash or produce corrupt output.
+  mazarbulib_tick(&lib);  // Must not crash or produce corrupt output.
   TEST_ASSERT(strstr(g_uart_buf, "label") != NULL);
 }
 
@@ -299,6 +299,19 @@ static void test_max_screens_rows(void) {
                                       &v) == MAZARBULIB_ERR_FULL);
 }
 
+static void test_version(void) {
+  // The string form must match the numeric MAJOR.MINOR.PATCH macros, and the
+  // encoded form must match MAZARBULIB_VERSION_ENCODE of the same parts.
+  char expected[32];
+  snprintf(expected, sizeof(expected), "%d.%d.%d", MAZARBULIB_VERSION_MAJOR,
+           MAZARBULIB_VERSION_MINOR, MAZARBULIB_VERSION_PATCH);
+  TEST_ASSERT(strcmp(expected, MAZARBULIB_VERSION_STRING) == 0);
+  TEST_ASSERT(MAZARBULIB_VERSION ==
+              MAZARBULIB_VERSION_ENCODE(MAZARBULIB_VERSION_MAJOR,
+                                        MAZARBULIB_VERSION_MINOR,
+                                        MAZARBULIB_VERSION_PATCH));
+}
+
 // ---------------------------------------------------------------------------
 // Entry point
 // ---------------------------------------------------------------------------
@@ -321,6 +334,7 @@ static const mazarbulib_test_entry_t k_tests[] = {
     {"test_empty_string_row", test_empty_string_row},
     {"test_null_guards", test_null_guards},
     {"test_max_screens_rows", test_max_screens_rows},
+    {"test_version", test_version},
 };
 
 #define K_TEST_COUNT ((int)(sizeof(k_tests) / sizeof(k_tests[0])))
