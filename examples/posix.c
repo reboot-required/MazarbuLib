@@ -12,11 +12,9 @@
 // layouts and value formatting without target hardware. UART navigation
 // (n/p keys) is not wired up here.
 //
-// Build (from repo root):
-//   make posix-example
-// or directly:
-//   gcc -std=c99 -Wall -Wextra -Wpedantic -Iinclude \
-//       examples/posix.c src/mazarbulib.c -o mazarbulib_posix_demo
+// Build (from repo root): make posix-example
+// or compile examples/posix.c and src/mazarbulib.c together with include/
+// on the include path.
 //
 // Run: ./mazarbulib_posix_demo
 
