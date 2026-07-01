@@ -68,3 +68,48 @@ jobs:
 
       - name: Build and run tests — Makefile
         run: make test CFLAGS="-std=c99 -Wall -Wextra -Wpedantic -Werror"
+
+  # ---------------------------------------------------------------------------
+  # Sanitizers: run the test suite under AddressSanitizer + UBSan.
+  # ---------------------------------------------------------------------------
+  sanitizers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure + build + test with sanitizers
+        run: |
+          cmake -B build \
+            -DMAZARBULIB_BUILD_TESTS=ON \
+            -DMAZARBULIB_BUILD_EXAMPLES=ON \
+            -DMAZARBULIB_ENABLE_SANITIZERS=ON
+          cmake --build build
+          ctest --test-dir build --output-on-failure
+
+  # ---------------------------------------------------------------------------
+  # Static analysis. Advisory for now (continue-on-error) until the findings
+  # have been baselined on a real CI run; promote to required afterwards.
+  # ---------------------------------------------------------------------------
+  static-analysis:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install analyzers
+        run: sudo apt-get update && sudo apt-get install -y cppcheck clang-tidy
+
+      - name: cppcheck
+        run: |
+          cppcheck --std=c99 \
+            --enable=warning,style,performance,portability \
+            --error-exitcode=1 --inline-suppr \
+            -Iinclude src tests examples/posix.c
+
+      - name: clang-tidy
+        run: |
+          cmake -B build \
+            -DMAZARBULIB_BUILD_TESTS=ON \
+            -DMAZARBULIB_BUILD_EXAMPLES=ON \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          clang-tidy -p build src/mazarbulib.c

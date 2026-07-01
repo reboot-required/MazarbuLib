@@ -22,6 +22,8 @@ option(MAZARBULIB_BUILD_TESTS    "Build MazarbuLib tests"    OFF)
 option(MAZARBULIB_BUILD_EXAMPLES "Build MazarbuLib examples" OFF)
 option(MAZARBULIB_WARNINGS_AS_ERRORS
        "Treat compiler warnings as errors (used by CI)" OFF)
+option(MAZARBULIB_ENABLE_SANITIZERS
+       "Build first-party targets with ASan + UBSan (host testing only)" OFF)
 
 # Warning flags shared by every first-party target. -Werror is opt-in so that
 # consumers building the library are never broken by a newer compiler warning;
@@ -29,6 +31,13 @@ option(MAZARBULIB_WARNINGS_AS_ERRORS
 set(MAZARBULIB_WARNING_FLAGS
   $<$<C_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic>
   $<$<AND:$<BOOL:${MAZARBULIB_WARNINGS_AS_ERRORS}>,$<C_COMPILER_ID:GNU,Clang>>:-Werror>
+)
+
+# AddressSanitizer + UBSan flags, opt-in for host test/example builds only.
+# Applied to both compile and link so the library objects are instrumented too;
+# never enabled by default, so the shipped embedded build stays untouched.
+set(MAZARBULIB_SANITIZER_FLAGS
+  $<$<AND:$<BOOL:${MAZARBULIB_ENABLE_SANITIZERS}>,$<C_COMPILER_ID:GNU,Clang>>:-fsanitize=address,undefined;-fno-sanitize-recover=all>
 )
 
 # ---------------------------------------------------------------------------
@@ -46,7 +55,8 @@ target_include_directories(mazarbulib PUBLIC
 
 target_compile_features(mazarbulib PUBLIC c_std_99)
 
-target_compile_options(mazarbulib PRIVATE ${MAZARBULIB_WARNING_FLAGS})
+target_compile_options(mazarbulib PRIVATE ${MAZARBULIB_WARNING_FLAGS}
+                                          ${MAZARBULIB_SANITIZER_FLAGS})
 
 # ---------------------------------------------------------------------------
 # Tests
@@ -57,7 +67,9 @@ if(MAZARBULIB_BUILD_TESTS)
 
   add_executable(mazarbulib_test tests/test_mazarbulib.c)
   target_link_libraries(mazarbulib_test PRIVATE mazarbulib)
-  target_compile_options(mazarbulib_test PRIVATE ${MAZARBULIB_WARNING_FLAGS})
+  target_compile_options(mazarbulib_test PRIVATE ${MAZARBULIB_WARNING_FLAGS}
+                                                 ${MAZARBULIB_SANITIZER_FLAGS})
+  target_link_options(mazarbulib_test PRIVATE ${MAZARBULIB_SANITIZER_FLAGS})
 
   add_test(NAME test_init             COMMAND mazarbulib_test test_init)
   add_test(NAME test_register_screen
@@ -84,7 +96,10 @@ if(MAZARBULIB_BUILD_EXAMPLES)
   add_executable(mazarbulib_posix_demo examples/posix.c)
   target_link_libraries(mazarbulib_posix_demo PRIVATE mazarbulib)
   target_compile_options(mazarbulib_posix_demo PRIVATE
-                         ${MAZARBULIB_WARNING_FLAGS})
+                         ${MAZARBULIB_WARNING_FLAGS}
+                         ${MAZARBULIB_SANITIZER_FLAGS})
+  target_link_options(mazarbulib_posix_demo PRIVATE
+                      ${MAZARBULIB_SANITIZER_FLAGS})
 endif()
 
 # ---------------------------------------------------------------------------
