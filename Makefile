@@ -9,8 +9,10 @@
 CC  ?= gcc
 AR  ?= ar
 
-CFLAGS  ?= -std=c99 -Wall -Wextra -Wpedantic
-CFLAGS  += -Iinclude
+# CFLAGS is overridable (CI adds -Werror); the library's include path lives in
+# CPPFLAGS so overriding CFLAGS never drops it.
+CFLAGS   ?= -std=c99 -Wall -Wextra -Wpedantic
+CPPFLAGS += -Iinclude
 
 SRC := src/mazarbulib.c
 OBJ := $(SRC:.c=.o)
@@ -30,13 +32,13 @@ $(LIB): $(OBJ)
 	$(AR) rcs $@ $^
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
 
 posix-example: $(SRC) $(EXAMPLE_SRC)
-	$(CC) $(CFLAGS) $(SRC) $(EXAMPLE_SRC) -o $(EXAMPLE_BIN)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) $(EXAMPLE_SRC) -o $(EXAMPLE_BIN)
 
 test: $(SRC) $(TEST_SRC)
-	$(CC) $(CFLAGS) $(SRC) $(TEST_SRC) -o $(TEST_BIN)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) $(TEST_SRC) -o $(TEST_BIN)
 	./$(TEST_BIN)
 
 clean:

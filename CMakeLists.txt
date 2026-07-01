@@ -20,6 +20,16 @@ project(mazarbulib
 
 option(MAZARBULIB_BUILD_TESTS    "Build MazarbuLib tests"    OFF)
 option(MAZARBULIB_BUILD_EXAMPLES "Build MazarbuLib examples" OFF)
+option(MAZARBULIB_WARNINGS_AS_ERRORS
+       "Treat compiler warnings as errors (used by CI)" OFF)
+
+# Warning flags shared by every first-party target. -Werror is opt-in so that
+# consumers building the library are never broken by a newer compiler warning;
+# CI turns it on via -DMAZARBULIB_WARNINGS_AS_ERRORS=ON.
+set(MAZARBULIB_WARNING_FLAGS
+  $<$<C_COMPILER_ID:GNU,Clang>:-Wall;-Wextra;-Wpedantic>
+  $<$<AND:$<BOOL:${MAZARBULIB_WARNINGS_AS_ERRORS}>,$<C_COMPILER_ID:GNU,Clang>>:-Werror>
+)
 
 # ---------------------------------------------------------------------------
 # Library target
@@ -36,9 +46,7 @@ target_include_directories(mazarbulib PUBLIC
 
 target_compile_features(mazarbulib PUBLIC c_std_99)
 
-target_compile_options(mazarbulib PRIVATE
-  $<$<C_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic>
-)
+target_compile_options(mazarbulib PRIVATE ${MAZARBULIB_WARNING_FLAGS})
 
 # ---------------------------------------------------------------------------
 # Tests
@@ -49,9 +57,7 @@ if(MAZARBULIB_BUILD_TESTS)
 
   add_executable(mazarbulib_test tests/test_mazarbulib.c)
   target_link_libraries(mazarbulib_test PRIVATE mazarbulib)
-  target_compile_options(mazarbulib_test PRIVATE
-    $<$<C_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic>
-  )
+  target_compile_options(mazarbulib_test PRIVATE ${MAZARBULIB_WARNING_FLAGS})
 
   add_test(NAME test_init             COMMAND mazarbulib_test test_init)
   add_test(NAME test_register_screen
@@ -78,8 +84,7 @@ if(MAZARBULIB_BUILD_EXAMPLES)
   add_executable(mazarbulib_posix_demo examples/posix.c)
   target_link_libraries(mazarbulib_posix_demo PRIVATE mazarbulib)
   target_compile_options(mazarbulib_posix_demo PRIVATE
-    $<$<C_COMPILER_ID:GNU,Clang>:-Wall -Wextra -Wpedantic>
-  )
+                         ${MAZARBULIB_WARNING_FLAGS})
 endif()
 
 # ---------------------------------------------------------------------------

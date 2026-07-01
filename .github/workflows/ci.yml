@@ -13,20 +13,45 @@ on:
   pull_request:
 
 jobs:
-  build:
+  # ---------------------------------------------------------------------------
+  # Formatting: every source file must match .clang-format.
+  # ---------------------------------------------------------------------------
+  format:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
-      # -----------------------------------------------------------------------
-      # CMake build path
-      # -----------------------------------------------------------------------
+      - name: clang-format check
+        run: |
+          clang-format --version
+          clang-format --dry-run --Werror \
+            src/*.c include/*.h tests/*.c examples/*.c examples/*.cpp
+
+  # ---------------------------------------------------------------------------
+  # Build + test on GCC and Clang, warnings promoted to errors.
+  # ---------------------------------------------------------------------------
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        cc: [gcc, clang]
+    env:
+      CC: ${{ matrix.cc }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Clang
+        if: matrix.cc == 'clang'
+        run: sudo apt-get update && sudo apt-get install -y clang
+
+      # ----- CMake build path -----
       - name: Configure — CMake
         run: |
           cmake -B build \
             -DMAZARBULIB_BUILD_TESTS=ON \
-            -DMAZARBULIB_BUILD_EXAMPLES=ON
+            -DMAZARBULIB_BUILD_EXAMPLES=ON \
+            -DMAZARBULIB_WARNINGS_AS_ERRORS=ON
 
       - name: Build — CMake
         run: cmake --build build
@@ -34,14 +59,12 @@ jobs:
       - name: Run tests — CMake / CTest
         run: ctest --test-dir build --output-on-failure
 
-      # -----------------------------------------------------------------------
-      # Makefile build path
-      # -----------------------------------------------------------------------
+      # ----- Makefile build path -----
       - name: Build library — Makefile
-        run: make
+        run: make CFLAGS="-std=c99 -Wall -Wextra -Wpedantic -Werror"
 
       - name: Build posix example — Makefile
-        run: make posix-example
+        run: make posix-example CFLAGS="-std=c99 -Wall -Wextra -Wpedantic -Werror"
 
       - name: Build and run tests — Makefile
-        run: make test
+        run: make test CFLAGS="-std=c99 -Wall -Wextra -Wpedantic -Werror"
