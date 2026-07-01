@@ -108,47 +108,66 @@ static void mazarbulib_format_value_(const mazarbulib_row_t *row, char *buf,
   }
 }
 
-// Renders the currently active screen to UART.
-static void mazarbulib_render_screen_(mazarbulib_t *ctx) {
+// Sends the screen title line, truncated to MAZARBULIB_TITLE_MAX_LEN_ so it
+// always fits the line buffer.
+static void mazarbulib_send_title_(mazarbulib_t *ctx,
+                                   const mazarbulib_screen_t *s) {
   char line[MAZARBULIB_LINE_BUF_SIZE_];
-  const mazarbulib_screen_t *s = &ctx->screens[ctx->active_screen];
+  int n = snprintf(line, sizeof(line), "=== %.*s ===\r\n",
+                   MAZARBULIB_TITLE_MAX_LEN_, s->name);
+  mazarbulib_send_line_(ctx, line, n, sizeof(line));
+}
+
+// Formats and sends a single data row. Both columns are padded and clamped to
+// their configured widths with %-*.*s / %*.*s so the borders stay aligned
+// regardless of content length; the value column is right-aligned for numeric
+// types and left-aligned otherwise.
+static void mazarbulib_send_row_(mazarbulib_t *ctx,
+                                 const mazarbulib_row_t *row) {
+  char line[MAZARBULIB_LINE_BUF_SIZE_];
+  char val_buf[MAZARBULIB_VALUE_WIDTH + 1];
   int n;
 
-  // Title — truncated to MAZARBULIB_TITLE_MAX_LEN_ to stay within line buffer.
-  n = snprintf(line, sizeof(line), "=== %.*s ===\r\n",
-               MAZARBULIB_TITLE_MAX_LEN_, s->name);
-  mazarbulib_send_line_(ctx, line, n, sizeof(line));
+  mazarbulib_format_value_(row, val_buf, sizeof(val_buf));
 
-  mazarbulib_send_separator_(ctx);
-
-  for (uint8_t i = 0; i < s->row_count; i++) {
-    const mazarbulib_row_t *row = &s->rows[i];
-    char val_buf[MAZARBULIB_VALUE_WIDTH + 1];
-
-    mazarbulib_format_value_(row, val_buf, sizeof(val_buf));
-
-    // Use %-*.*s / %*.*s to both pad and clamp each column to its configured
-    // width, keeping the table borders aligned regardless of content length.
-    if (mazarbulib_is_right_aligned_(row->type)) {
-      n = snprintf(line, sizeof(line), "| %-*.*s | %*.*s |\r\n",
-                   MAZARBULIB_LABEL_WIDTH, MAZARBULIB_LABEL_WIDTH, row->label,
-                   MAZARBULIB_VALUE_WIDTH, MAZARBULIB_VALUE_WIDTH, val_buf);
-    } else {
-      n = snprintf(line, sizeof(line), "| %-*.*s | %-*.*s |\r\n",
-                   MAZARBULIB_LABEL_WIDTH, MAZARBULIB_LABEL_WIDTH, row->label,
-                   MAZARBULIB_VALUE_WIDTH, MAZARBULIB_VALUE_WIDTH, val_buf);
-    }
-    mazarbulib_send_line_(ctx, line, n, sizeof(line));
+  // The two branches differ only in the value column's alignment. They are
+  // kept as separate string literals (rather than selecting one at runtime)
+  // so the format arguments stay compiler-checkable and no
+  // -Wformat-nonliteral is triggered.
+  if (mazarbulib_is_right_aligned_(row->type)) {
+    n = snprintf(line, sizeof(line), "| %-*.*s | %*.*s |\r\n",
+                 MAZARBULIB_LABEL_WIDTH, MAZARBULIB_LABEL_WIDTH, row->label,
+                 MAZARBULIB_VALUE_WIDTH, MAZARBULIB_VALUE_WIDTH, val_buf);
+  } else {
+    n = snprintf(line, sizeof(line), "| %-*.*s | %-*.*s |\r\n",
+                 MAZARBULIB_LABEL_WIDTH, MAZARBULIB_LABEL_WIDTH, row->label,
+                 MAZARBULIB_VALUE_WIDTH, MAZARBULIB_VALUE_WIDTH, val_buf);
   }
-
-  mazarbulib_send_separator_(ctx);
-
-  // Navigation footer.
-  n = snprintf(line, sizeof(line), "[%c]=next  [%c]=prev  (%u/%u)\r\n",
-               MAZARBULIB_NAV_NEXT, MAZARBULIB_NAV_PREV,
-               (unsigned)(ctx->active_screen + 1u),
-               (unsigned)ctx->screen_count);
   mazarbulib_send_line_(ctx, line, n, sizeof(line));
+}
+
+// Sends the navigation footer: the nav keys and 1-based active/total counter.
+static void mazarbulib_send_footer_(mazarbulib_t *ctx) {
+  char line[MAZARBULIB_LINE_BUF_SIZE_];
+  int n = snprintf(line, sizeof(line), "[%c]=next  [%c]=prev  (%u/%u)\r\n",
+                   MAZARBULIB_NAV_NEXT, MAZARBULIB_NAV_PREV,
+                   (unsigned)(ctx->active_screen + 1u),
+                   (unsigned)ctx->screen_count);
+  mazarbulib_send_line_(ctx, line, n, sizeof(line));
+}
+
+// Renders the currently active screen to UART: title and footer with the row
+// table in between, framed by separator borders.
+static void mazarbulib_render_screen_(mazarbulib_t *ctx) {
+  const mazarbulib_screen_t *s = &ctx->screens[ctx->active_screen];
+
+  mazarbulib_send_title_(ctx, s);
+  mazarbulib_send_separator_(ctx);
+  for (uint8_t i = 0; i < s->row_count; i++) {
+    mazarbulib_send_row_(ctx, &s->rows[i]);
+  }
+  mazarbulib_send_separator_(ctx);
+  mazarbulib_send_footer_(ctx);
 }
 
 // ---------------------------------------------------------------------------
