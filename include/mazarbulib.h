@@ -20,6 +20,39 @@ extern "C" {
 #endif
 
 // -----------------------------------------------------------------------------
+// Version
+// -----------------------------------------------------------------------------
+
+// Library version. Kept in sync with project() in CMakeLists.txt and the
+// "version" field in library.json; bump all three together on release.
+#define MAZARBULIB_VERSION_MAJOR 0
+#define MAZARBULIB_VERSION_MINOR 1
+#define MAZARBULIB_VERSION_PATCH 2
+
+// Encodes (major, minor, patch) as 0xMMNNPP for ordered comparisons, e.g.
+//   #if MAZARBULIB_VERSION >= MAZARBULIB_VERSION_ENCODE(0, 1, 2)
+#define MAZARBULIB_VERSION_ENCODE(major, minor, patch) \
+  (((major) << 16) | ((minor) << 8) | (patch))
+
+// This build's encoded version.
+#define MAZARBULIB_VERSION                            \
+  MAZARBULIB_VERSION_ENCODE(MAZARBULIB_VERSION_MAJOR, \
+                            MAZARBULIB_VERSION_MINOR, \
+                            MAZARBULIB_VERSION_PATCH)
+
+// String form, e.g. "0.1.2". The two-level indirection expands the numeric
+// version macros before stringizing them. clang-format is disabled around
+// the concatenation below because it reflows it past the 80-column limit.
+#define MAZARBULIB_VERSION_STRINGIZE_(x) #x
+#define MAZARBULIB_VERSION_STR_(x) MAZARBULIB_VERSION_STRINGIZE_(x)
+// clang-format off
+#define MAZARBULIB_VERSION_STRING \
+  MAZARBULIB_VERSION_STR_(MAZARBULIB_VERSION_MAJOR) "." \
+  MAZARBULIB_VERSION_STR_(MAZARBULIB_VERSION_MINOR) "." \
+  MAZARBULIB_VERSION_STR_(MAZARBULIB_VERSION_PATCH)
+// clang-format on
+
+// -----------------------------------------------------------------------------
 // Types
 // -----------------------------------------------------------------------------
 

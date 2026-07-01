@@ -204,6 +204,17 @@ On Cortex-M0 targets with newlib-nano you may need the linker flag
 **Config limits** — `MAZARBULIB_MAX_SCREENS` and `MAZARBULIB_MAX_ROWS_PER_SCREEN`
 are stored in `uint8_t` counters. Values above 255 produce a compile-time error.
 
+**Version macros** — `mazarbulib.h` exposes `MAZARBULIB_VERSION_MAJOR`,
+`MAZARBULIB_VERSION_MINOR`, `MAZARBULIB_VERSION_PATCH`, the string form
+`MAZARBULIB_VERSION_STRING` (e.g. `"0.1.2"`), and the encoded
+`MAZARBULIB_VERSION` for ordered comparisons:
+
+```c
+#if MAZARBULIB_VERSION >= MAZARBULIB_VERSION_ENCODE(0, 1, 2)
+  // feature available since 0.1.2
+#endif
+```
+
 ## License
 
 MIT — see [LICENSE](LICENSE).

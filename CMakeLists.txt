@@ -86,6 +86,7 @@ if(MAZARBULIB_BUILD_TESTS)
   add_test(NAME test_null_guards      COMMAND mazarbulib_test test_null_guards)
   add_test(NAME test_max_screens_rows
            COMMAND mazarbulib_test test_max_screens_rows)
+  add_test(NAME test_version          COMMAND mazarbulib_test test_version)
 endif()
 
 # ---------------------------------------------------------------------------

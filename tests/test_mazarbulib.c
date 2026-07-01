@@ -299,6 +299,19 @@ static void test_max_screens_rows(void) {
                                       &v) == MAZARBULIB_ERR_FULL);
 }
 
+static void test_version(void) {
+  // The string form must match the numeric MAJOR.MINOR.PATCH macros, and the
+  // encoded form must match MAZARBULIB_VERSION_ENCODE of the same parts.
+  char expected[32];
+  snprintf(expected, sizeof(expected), "%d.%d.%d", MAZARBULIB_VERSION_MAJOR,
+           MAZARBULIB_VERSION_MINOR, MAZARBULIB_VERSION_PATCH);
+  TEST_ASSERT(strcmp(expected, MAZARBULIB_VERSION_STRING) == 0);
+  TEST_ASSERT(MAZARBULIB_VERSION ==
+              MAZARBULIB_VERSION_ENCODE(MAZARBULIB_VERSION_MAJOR,
+                                        MAZARBULIB_VERSION_MINOR,
+                                        MAZARBULIB_VERSION_PATCH));
+}
+
 // ---------------------------------------------------------------------------
 // Entry point
 // ---------------------------------------------------------------------------
@@ -321,6 +334,7 @@ static const mazarbulib_test_entry_t k_tests[] = {
     {"test_empty_string_row", test_empty_string_row},
     {"test_null_guards", test_null_guards},
     {"test_max_screens_rows", test_max_screens_rows},
+    {"test_version", test_version},
 };
 
 #define K_TEST_COUNT ((int)(sizeof(k_tests) / sizeof(k_tests[0])))
