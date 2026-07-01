@@ -176,12 +176,12 @@ Override these before `mazarbulib_config.h` is included, for example with
 | Macro | Meaning |
 |-------|---------|
 | `MAZARBULIB_VERSION_MAJOR` / `MINOR` / `PATCH` | Numeric version parts. |
-| `MAZARBULIB_VERSION_STRING` | String form, for example `"0.1.2"`. |
+| `MAZARBULIB_VERSION_STRING` | String form, for example `"0.1.3"`. |
 | `MAZARBULIB_VERSION` | Encoded `0xMMNNPP` for ordered comparisons. |
 | `MAZARBULIB_VERSION_ENCODE(major, minor, patch)` | Encodes parts the same way. |
 
 ```c
-#if MAZARBULIB_VERSION >= MAZARBULIB_VERSION_ENCODE(0, 1, 2)
-  // feature available since 0.1.2
+#if MAZARBULIB_VERSION >= MAZARBULIB_VERSION_ENCODE(0, 1, 3)
+  // feature available since 0.1.3
 #endif
 ```

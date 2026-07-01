@@ -9,7 +9,7 @@
 cmake_minimum_required(VERSION 3.15)
 
 project(mazarbulib
-  VERSION 0.1.2
+  VERSION 0.1.3
   LANGUAGES C
   DESCRIPTION "UART tabular screen display library for embedded systems"
 )

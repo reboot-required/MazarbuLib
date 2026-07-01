@@ -27,7 +27,7 @@ extern "C" {
 // "version" field in library.json; bump all three together on release.
 #define MAZARBULIB_VERSION_MAJOR 0
 #define MAZARBULIB_VERSION_MINOR 1
-#define MAZARBULIB_VERSION_PATCH 2
+#define MAZARBULIB_VERSION_PATCH 3
 
 // Encodes (major, minor, patch) as 0xMMNNPP for ordered comparisons, e.g.
 //   #if MAZARBULIB_VERSION >= MAZARBULIB_VERSION_ENCODE(0, 1, 2)
@@ -40,7 +40,7 @@ extern "C" {
                             MAZARBULIB_VERSION_MINOR, \
                             MAZARBULIB_VERSION_PATCH)
 
-// String form, e.g. "0.1.2". The two-level indirection expands the numeric
+// String form, e.g. "0.1.3". The two-level indirection expands the numeric
 // version macros before stringizing them. clang-format is disabled around
 // the concatenation below because it reflows it past the 80-column limit.
 #define MAZARBULIB_VERSION_STRINGIZE_(x) #x
