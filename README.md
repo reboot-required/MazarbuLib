@@ -3,12 +3,12 @@
 [![CI](https://github.com/reboot-required/MazarbuLib/actions/workflows/ci.yml/badge.svg)](https://github.com/reboot-required/MazarbuLib/actions/workflows/ci.yml)
 
 A portable, static-allocation C library for displaying tabular screens of data
-over UART. Designed to be embedded in projects as a git submodule — no dynamic
+over UART. Designed to be embedded in projects as a git submodule: no dynamic
 allocation, no OS dependencies, one translation unit.
 
 ## Name
 
-*MazarbuLib* is named after the **Book of Mazarbul** — the dwarf record-book
+*MazarbuLib* is named after the **Book of Mazarbul**, the dwarf record-book
 discovered by the Fellowship in the Chamber of Mazarbul in Moria, as described
 in J.R.R. Tolkien's *The Lord of the Rings*. Like those carved records, this
 library keeps structured data visible and readable.
@@ -20,7 +20,7 @@ library keeps structured data visible and readable.
 - Supported value types: `int32_t`, `uint32_t`, `float`, `double`,
   `const char *`, `bool`, hex (`uint32_t` as `0xXXXXXXXX`)
 - UART navigation: feed received bytes to switch screens
-- Static allocation only — no `malloc`, all limits set at compile time
+- Static allocation only: no `malloc`, all limits set at compile time
 - C99, zero external dependencies
 
 ## Quick Start
@@ -31,14 +31,14 @@ library keeps structured data visible and readable.
 git submodule add https://github.com/reboot-required/MazarbuLib extern/mazarbulib
 ```
 
-### 2. Integrate — CMake
+### 2. Integrate with CMake
 
 ```cmake
 add_subdirectory(extern/mazarbulib)
 target_link_libraries(my_target PRIVATE mazarbulib)
 ```
 
-### 3. Integrate — plain Makefile
+### 3. Integrate with a plain Makefile
 
 Add `extern/mazarbulib/include` to your include path and compile
 `extern/mazarbulib/src/mazarbulib.c` alongside your sources.
@@ -95,7 +95,7 @@ void uart_rx_callback(char c) {
 | Temperature          |           23.50 |
 | RPM                  |            1200 |
 +----------------------+-----------------+
-[n]ext  [p]rev  (1/2)
+[n]=next  [p]=prev  (1/1)
 ```
 
 ## Building
@@ -171,7 +171,7 @@ is included.
 
 ## Notes
 
-**`MAZARBULIB_TYPE_STRING` contract** — `value_ptr` must be a non-NULL
+**`MAZARBULIB_TYPE_STRING` contract:** `value_ptr` must be a non-NULL
 `const char *` pointing directly to the string data. Pass the pointer itself,
 not its address:
 
@@ -187,24 +187,24 @@ For an empty string pass `""`. To display a string whose pointer may change
 at runtime, keep the pointer itself stable (e.g. a fixed-size char array or a
 persistent buffer) and update its contents in place.
 
-**Truncation** — labels longer than `MAZARBULIB_LABEL_WIDTH` and values
-longer than `MAZARBULIB_VALUE_WIDTH` are silently truncated so that table
+**Truncation:** labels longer than `MAZARBULIB_LABEL_WIDTH` and values
+longer than `MAZARBULIB_VALUE_WIDTH` are truncated so that table
 borders remain aligned. Screen names longer than
 `MAZARBULIB_LABEL_WIDTH + MAZARBULIB_VALUE_WIDTH + 4` are likewise truncated
 in the title line.
 
-**Thread safety** — MazarbuLib is single-threaded. If `mazarbulib_feed_char`
+**Thread safety:** MazarbuLib is single-threaded. If `mazarbulib_feed_char`
 is called from a UART ISR while `mazarbulib_tick` runs in the main loop,
 protect the context with a critical section appropriate to your platform.
 
-**Float formatting** — `float` and `double` rows use `snprintf` with `%.2f`.
+**Float formatting:** `float` and `double` rows use `snprintf` with `%.2f`.
 On Cortex-M0 targets with newlib-nano you may need the linker flag
 `-u _printf_float` to enable floating-point printf support.
 
-**Config limits** — `MAZARBULIB_MAX_SCREENS` and `MAZARBULIB_MAX_ROWS_PER_SCREEN`
+**Config limits:** `MAZARBULIB_MAX_SCREENS` and `MAZARBULIB_MAX_ROWS_PER_SCREEN`
 are stored in `uint8_t` counters. Values above 255 produce a compile-time error.
 
-**Version macros** — `mazarbulib.h` exposes `MAZARBULIB_VERSION_MAJOR`,
+**Version macros:** `mazarbulib.h` exposes `MAZARBULIB_VERSION_MAJOR`,
 `MAZARBULIB_VERSION_MINOR`, `MAZARBULIB_VERSION_PATCH`, the string form
 `MAZARBULIB_VERSION_STRING` (e.g. `"0.1.2"`), and the encoded
 `MAZARBULIB_VERSION` for ordered comparisons:
@@ -217,4 +217,4 @@ are stored in `uint8_t` counters. Values above 255 produce a compile-time error.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).

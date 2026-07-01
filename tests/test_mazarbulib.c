@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Lukas Kraft
 // https://github.com/reboot-required
 //
-// Part of MazarbuLib — a UART screen display library for embedded systems.
+// Part of MazarbuLib, a UART screen display library for embedded systems.
 // Named after the Book of Mazarbul from J.R.R. Tolkien's writings.
 //
 // SPDX-License-Identifier: MIT
@@ -198,7 +198,7 @@ static void test_rendering(void) {
 }
 
 static void test_string_type(void) {
-  // MAZARBULIB_TYPE_STRING: value_ptr is the const char * itself — pass the
+  // MAZARBULIB_TYPE_STRING: value_ptr is the const char * itself; pass the
   // buffer address directly, not the address of a pointer variable.
   // In-place mutations to the buffer are visible at each tick.
   mazarbulib_t lib;
@@ -212,7 +212,7 @@ static void test_string_type(void) {
   mazarbulib_tick(&lib);
   TEST_ASSERT(strstr(g_uart_buf, "idle") != NULL);
 
-  // In-place update — the next render must pick up the new string.
+  // In-place update: the next render must pick up the new string.
   snprintf(msg, sizeof(msg), "%s", "running");
   uart_reset();
   mazarbulib_tick(&lib);

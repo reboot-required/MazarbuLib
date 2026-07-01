@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Lukas Kraft
 // https://github.com/reboot-required
 //
-// Part of MazarbuLib — a UART screen display library for embedded systems.
+// Part of MazarbuLib, a UART screen display library for embedded systems.
 // Named after the Book of Mazarbul from J.R.R. Tolkien's writings.
 //
 // SPDX-License-Identifier: MIT
@@ -20,16 +20,15 @@ typedef char
 typedef char mazarbulib_assert_rows_fit_uint8_
     [(MAZARBULIB_MAX_ROWS_PER_SCREEN <= 255u) ? 1 : -1];
 
-// Internal line buffer large enough for any formatted table line. The widest
-// line is a row: "| " + label + " | " + value + " |\r\n" plus a NUL, i.e.
-// LABEL_WIDTH + VALUE_WIDTH + 10 bytes; the +16 leaves a safety margin.
+// Line buffer sized for the widest formatted table line. A data row needs
+// "| " + label + " | " + value + " |\r\n" + NUL = LABEL_WIDTH + VALUE_WIDTH +
+// 10 bytes; the rest is headroom that also bounds the title line below.
 #define MAZARBULIB_LINE_BUF_SIZE_ \
   (MAZARBULIB_LABEL_WIDTH + MAZARBULIB_VALUE_WIDTH + 16)
 
-// Maximum number of characters from the screen name that fit on the title
-// line ("=== <name> ===\r\n") within MAZARBULIB_LINE_BUF_SIZE_.
-// Actual format overhead is 11 bytes: "=== " (4) + " ===\r\n" (6) + NUL (1).
-// Reserve 12 bytes here intentionally to keep a one-byte safety margin.
+// Screen-name characters that fit on the title line "=== <name> ===\r\n"
+// within the line buffer. Format overhead is 11 bytes ("=== " + " ===\r\n" +
+// NUL); reserving 12 keeps one byte of headroom.
 #define MAZARBULIB_TITLE_MAX_LEN_ (MAZARBULIB_LINE_BUF_SIZE_ - 12)
 
 // Dash count for each table border segment (column width + two spaces).

@@ -1,28 +1,24 @@
 // Copyright (c) 2026 Lukas Kraft
 // https://github.com/reboot-required
 //
-// Part of MazarbuLib — a UART screen display library for embedded systems.
+// Part of MazarbuLib, a UART screen display library for embedded systems.
 // Named after the Book of Mazarbul from J.R.R. Tolkien's writings.
 //
 // SPDX-License-Identifier: MIT
 
-// POSIX / host-testing example.
+// POSIX / host-testing example. Reference integration, not production-ready.
 //
-// NOTE: This file is a reference illustration of how MazarbuLib could be
-// integrated on this platform. It is not production-ready code — adapt it
-// to your project's actual peripheral configuration, error handling strategy,
-// and coding standards before use.
-//
-// Renders a live-updating table to stdout. Useful for iterating on screen
-// layouts and value formatting without target hardware.
+// Renders a live-updating table to stdout, useful for iterating on screen
+// layouts and value formatting without target hardware. UART navigation
+// (n/p keys) is not wired up here.
 //
 // Build (from repo root):
-//   gcc -std=c99 -Wall -Wextra -Wpedantic -Iinclude examples/posix.c
-//   src/mazarbulib.c -o mazarbulib_demo or: make posix-example
+//   make posix-example
+// or directly:
+//   gcc -std=c99 -Wall -Wextra -Wpedantic -Iinclude \
+//       examples/posix.c src/mazarbulib.c -o mazarbulib_posix_demo
 //
-// Run: ./mazarbulib_demo
-//
-// Note: UART navigation (n/p keys) is not wired up in this example.
+// Run: ./mazarbulib_posix_demo
 
 #include "mazarbulib.h"
 

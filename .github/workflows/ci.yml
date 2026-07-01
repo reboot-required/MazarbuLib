@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Lukas Kraft
 # https://github.com/reboot-required
 #
-# Part of MazarbuLib — a UART screen display library for embedded systems.
+# Part of MazarbuLib, a UART screen display library for embedded systems.
 # Named after the Book of Mazarbul from J.R.R. Tolkien's writings.
 #
 # SPDX-License-Identifier: MIT
@@ -46,27 +46,27 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y clang
 
       # ----- CMake build path -----
-      - name: Configure — CMake
+      - name: Configure (CMake)
         run: |
           cmake -B build \
             -DMAZARBULIB_BUILD_TESTS=ON \
             -DMAZARBULIB_BUILD_EXAMPLES=ON \
             -DMAZARBULIB_WARNINGS_AS_ERRORS=ON
 
-      - name: Build — CMake
+      - name: Build (CMake)
         run: cmake --build build
 
-      - name: Run tests — CMake / CTest
+      - name: Run tests (CMake / CTest)
         run: ctest --test-dir build --output-on-failure
 
       # ----- Makefile build path -----
-      - name: Build library — Makefile
+      - name: Build library (Makefile)
         run: make CFLAGS="-std=c99 -Wall -Wextra -Wpedantic -Werror"
 
-      - name: Build posix example — Makefile
+      - name: Build posix example (Makefile)
         run: make posix-example CFLAGS="-std=c99 -Wall -Wextra -Wpedantic -Werror"
 
-      - name: Build and run tests — Makefile
+      - name: Build and run tests (Makefile)
         run: make test CFLAGS="-std=c99 -Wall -Wextra -Wpedantic -Werror"
 
   # ---------------------------------------------------------------------------
