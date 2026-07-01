@@ -19,8 +19,8 @@
 // USART/UART peripheral connected to your terminal.
 
 #include "mazarbulib.h"
-#include "stm32xxxx_hal.h" // replace xxxx with your device family
-#include "usart.h"         // CubeMX-generated; declares huart1
+#include "stm32xxxx_hal.h"  // replace xxxx with your device family
+#include "usart.h"          // CubeMX-generated; declares huart1
 
 // Adjust to the UART handle connected to your terminal.
 extern UART_HandleTypeDef huart1;

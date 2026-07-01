@@ -25,34 +25,34 @@ extern "C" {
 
 // Supported value types for table rows.
 typedef enum {
-  MAZARBULIB_TYPE_INT32,  // int32_t, displayed as signed decimal.
-  MAZARBULIB_TYPE_UINT32, // uint32_t, displayed as unsigned decimal.
-  MAZARBULIB_TYPE_FLOAT,  // float, displayed with two decimal places.
-  MAZARBULIB_TYPE_DOUBLE, // double, displayed with two decimal places.
-  MAZARBULIB_TYPE_STRING, // const char *, rendered directly.
-  MAZARBULIB_TYPE_BOOL,   // bool, displayed as "true" / "false".
-  MAZARBULIB_TYPE_HEX,    // uint32_t, displayed as 0xXXXXXXXX.
+  MAZARBULIB_TYPE_INT32,   // int32_t, displayed as signed decimal.
+  MAZARBULIB_TYPE_UINT32,  // uint32_t, displayed as unsigned decimal.
+  MAZARBULIB_TYPE_FLOAT,   // float, displayed with two decimal places.
+  MAZARBULIB_TYPE_DOUBLE,  // double, displayed with two decimal places.
+  MAZARBULIB_TYPE_STRING,  // const char *, rendered directly.
+  MAZARBULIB_TYPE_BOOL,    // bool, displayed as "true" / "false".
+  MAZARBULIB_TYPE_HEX,     // uint32_t, displayed as 0xXXXXXXXX.
 } mazarbulib_type_t;
 
 // Return codes used throughout the API.
 typedef enum {
   MAZARBULIB_ERR_OK = 0,
-  MAZARBULIB_ERR_FULL = -1,    // Screen table or row table is full.
-  MAZARBULIB_ERR_INVALID = -2, // NULL pointer or out-of-range argument.
+  MAZARBULIB_ERR_FULL = -1,     // Screen table or row table is full.
+  MAZARBULIB_ERR_INVALID = -2,  // NULL pointer or out-of-range argument.
 } mazarbulib_err_t;
 
 // A single data row within a screen.
 typedef struct {
-  const char *label;      // Row label (pointer, not copied).
-  mazarbulib_type_t type; // Value type.
-  const void *value_ptr;  // Pointer dereferenced at render time.
+  const char *label;       // Row label (pointer, not copied).
+  mazarbulib_type_t type;  // Value type.
+  const void *value_ptr;   // Pointer dereferenced at render time.
 } mazarbulib_row_t;
 
 // A single named screen containing a fixed row table.
 typedef struct {
-  const char *name;                                      // Screen title.
-  mazarbulib_row_t rows[MAZARBULIB_MAX_ROWS_PER_SCREEN]; // Row table.
-  uint8_t row_count;                                     // Populated rows.
+  const char *name;                                       // Screen title.
+  mazarbulib_row_t rows[MAZARBULIB_MAX_ROWS_PER_SCREEN];  // Row table.
+  uint8_t row_count;                                      // Populated rows.
 } mazarbulib_screen_t;
 
 // Library context. Declare one instance statically in the application.
@@ -62,9 +62,9 @@ typedef struct {
 // MAZARBULIB_MAX_SCREENS or MAZARBULIB_MAX_ROWS_PER_SCREEN is raised above
 // 255 a compile-time error is produced in mazarbulib.c.
 typedef struct {
-  mazarbulib_screen_t screens[MAZARBULIB_MAX_SCREENS]; // Screen table.
-  uint8_t screen_count;  // Number of registered screens.
-  uint8_t active_screen; // Index of the currently displayed screen.
+  mazarbulib_screen_t screens[MAZARBULIB_MAX_SCREENS];  // Screen table.
+  uint8_t screen_count;   // Number of registered screens.
+  uint8_t active_screen;  // Index of the currently displayed screen.
 
   // Transmits len bytes starting at data over UART. Must not be NULL.
   void (*uart_send)(const char *data, size_t len);
@@ -139,7 +139,7 @@ void mazarbulib_feed_char(mazarbulib_t *ctx, char c);
 void mazarbulib_tick(mazarbulib_t *ctx);
 
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif
 
-#endif // MAZARBULIB_INCLUDE_MAZARBULIB_H_
+#endif  // MAZARBULIB_INCLUDE_MAZARBULIB_H_

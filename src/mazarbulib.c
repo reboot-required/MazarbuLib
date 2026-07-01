@@ -20,10 +20,10 @@ typedef char
 typedef char mazarbulib_assert_rows_fit_uint8_
     [(MAZARBULIB_MAX_ROWS_PER_SCREEN <= 255u) ? 1 : -1];
 
-// Internal line buffer large enough for any formatted table line.
-// Row layout: "| " + label(LABEL_WIDTH) + " | " + value(VALUE_WIDTH) + "
-// |\r\n\0"
-#define MAZARBULIB_LINE_BUF_SIZE_                                              \
+// Internal line buffer large enough for any formatted table line. The widest
+// line is a row: "| " + label + " | " + value + " |\r\n" plus a NUL, i.e.
+// LABEL_WIDTH + VALUE_WIDTH + 10 bytes; the +16 leaves a safety margin.
+#define MAZARBULIB_LINE_BUF_SIZE_ \
   (MAZARBULIB_LABEL_WIDTH + MAZARBULIB_VALUE_WIDTH + 16)
 
 // Maximum number of characters from the screen name that fit on the title
@@ -208,8 +208,7 @@ void mazarbulib_next_screen(mazarbulib_t *ctx) {
   if (ctx == NULL || ctx->screen_count == 0) {
     return;
   }
-  ctx->active_screen =
-      (uint8_t)((ctx->active_screen + 1u) % ctx->screen_count);
+  ctx->active_screen = (uint8_t)((ctx->active_screen + 1u) % ctx->screen_count);
 }
 
 void mazarbulib_prev_screen(mazarbulib_t *ctx) {

@@ -21,13 +21,13 @@
 static int g_tests_run = 0;
 static int g_tests_failed = 0;
 
-#define TEST_ASSERT(cond)                                                      \
-  do {                                                                         \
-    g_tests_run++;                                                             \
-    if (!(cond)) {                                                             \
-      fprintf(stderr, "FAIL  %s:%d  %s\n", __FILE__, __LINE__, #cond);         \
-      g_tests_failed++;                                                        \
-    }                                                                          \
+#define TEST_ASSERT(cond)                                              \
+  do {                                                                 \
+    g_tests_run++;                                                     \
+    if (!(cond)) {                                                     \
+      fprintf(stderr, "FAIL  %s:%d  %s\n", __FILE__, __LINE__, #cond); \
+      g_tests_failed++;                                                \
+    }                                                                  \
   } while (0)
 
 // ---------------------------------------------------------------------------
@@ -142,16 +142,16 @@ static void test_navigation(void) {
   mazarbulib_next_screen(&lib);
   TEST_ASSERT(lib.active_screen == 2);
 
-  mazarbulib_next_screen(&lib); // Wrap forward.
+  mazarbulib_next_screen(&lib);  // Wrap forward.
   TEST_ASSERT(lib.active_screen == 0);
 
-  mazarbulib_prev_screen(&lib); // Wrap backward.
+  mazarbulib_prev_screen(&lib);  // Wrap backward.
   TEST_ASSERT(lib.active_screen == 2);
 
   mazarbulib_set_screen(&lib, 1);
   TEST_ASSERT(lib.active_screen == 1);
 
-  mazarbulib_set_screen(&lib, 99); // Out of range: no-op.
+  mazarbulib_set_screen(&lib, 99);  // Out of range: no-op.
   TEST_ASSERT(lib.active_screen == 1);
 
   mazarbulib_set_screen(&lib, 0);
@@ -262,7 +262,7 @@ static void test_empty_string_row(void) {
   mazarbulib_register_row(&lib, s0, "label", MAZARBULIB_TYPE_STRING, empty);
 
   uart_reset();
-  mazarbulib_tick(&lib); // Must not crash or produce corrupt output.
+  mazarbulib_tick(&lib);  // Must not crash or produce corrupt output.
   TEST_ASSERT(strstr(g_uart_buf, "label") != NULL);
 }
 
