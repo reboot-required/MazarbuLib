@@ -23,6 +23,17 @@ library keeps structured data visible and readable.
 - Static allocation only: no `malloc`, all limits set at compile time
 - C99, zero external dependencies
 
+## Documentation
+
+This README is the quick-start entry point. Deeper documentation lives in
+[`docs/`](docs/README.md):
+
+- [Architecture](docs/architecture.md): data model, render pipeline, memory layout.
+- [API Reference](docs/api-reference.md): every function, type, and macro.
+- [Integration Guide](docs/integration.md): callbacks, ISR safety, target notes.
+- [Tooling Guide](docs/tooling.md): building, tests, sanitizers, analysis, CI.
+- [Design Decisions](docs/design-decisions.md): the rationale behind the design.
+
 ## Quick Start
 
 ### 1. Add as git submodule

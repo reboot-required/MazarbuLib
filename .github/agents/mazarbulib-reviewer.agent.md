@@ -58,6 +58,12 @@ All size limits must come from `mazarbulib_config.h` `#define` values.
 - Must compile clean with `-Wall -Wextra -Wpedantic -std=c99` on GCC and Clang.
 - Both `Makefile` and `CMakeLists.txt` must be kept in sync when source files are added.
 
+**Documentation**: `docs/` and `README.md` are plain Markdown with no generator.
+- Internal links must resolve to existing files and anchors.
+- Diagrams are Mermaid in fenced code blocks and must stay in sync with the code.
+- The source-file header block does not apply to Markdown docs.
+- The prose conventions above (no em-dashes, why-not-what, no filler) apply here too.
+
 ## Review Checklist
 
 For every file changed or added, verify:
@@ -80,6 +86,8 @@ For every file changed or added, verify:
 11. No em-dashes anywhere (comments, docs, README, CI step names, config files).
 12. Comments justify non-obvious decisions and do not restate the code; no
     repeated boilerplate or filler prose.
+13. Markdown docs: internal links resolve, Mermaid blocks are well-formed, and
+    the prose conventions hold. The source-file header is not required in docs.
 
 ## Constraints
 
